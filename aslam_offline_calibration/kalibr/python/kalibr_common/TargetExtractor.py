@@ -31,7 +31,7 @@ def multicoreExtractionWrapper(detector, taskq, resultq, clearImages, noTransfor
 def extractCornersFromDataset(dataset, detector, multithreading=False, numProcesses=None, clearImages=True, noTransformation=False):
     print "Extracting calibration target corners"    
     targetObservations = []
-    numImages = dataset.numImages()
+    numImages = dataset.numImages()   # dataset is the bag
     
     # prepare progess bar
     iProgress = sm.Progress2(numImages)

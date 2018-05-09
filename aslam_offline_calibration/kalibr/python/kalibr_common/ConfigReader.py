@@ -64,7 +64,7 @@ class AslamCamera(object):
                                             principalPoint[0], principalPoint[1], 
                                             resolution[0], resolution[1])
                 
-                self.camera = cv.PinholeCameraGeometry(proj)
+                self.geometry = cv.PinholeCameraGeometry(proj)
                 
                 self.frameType = cv.PinholeFrame
                 self.keypointType = cv.Keypoint2
@@ -257,10 +257,10 @@ class CameraParameters(ParametersBase):
                                         'none': 0}
                
         if model not in distortionModelsAndNumParams:
-            self.raiseError('Unknown distortion model. Supported models: {0}. )'.format(distortionModels) )
+            self.raiseError("Unknown distortion model '{}'. Supported models: {}.)".format(model, distortionModelsAndNumParams.keys()) )
         
         if len(coeffs) != distortionModelsAndNumParams[model]:
-            self.raiseError("distortion model requires 4 coefficients")
+            self.raiseError("distortion model '{}' requires {} coefficients".format(model, distortionModelsAndNumParams[model]))
     
     @catch_keyerror
     def getDistortion(self):       

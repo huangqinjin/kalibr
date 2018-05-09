@@ -200,7 +200,7 @@ def main():
         print "Cameras are not connected through mutual observations, please check the dataset. Maybe adjust the approx. sync. tolerance."
         graph.plotGraph()
         sys.exit(-1)
-       
+ 
     #loop to restart the optimization
     restartAttempts=3
     initOutlierRejection=True
@@ -339,7 +339,7 @@ def main():
                                     
                                     #display the corners info
                                     if parsed.verbose or parsed.doPlotOutliers:
-                                        sm.logInfo( "Outlier detected on view {4} with idx {5} (rerr=({0}, {1}) > ({2},{3}) )".format(reproj[0], reproj[1], se_threshold[0], se_threshold[1], view_id, pidx))
+                                        sm.logInfo( "Outlier detected on view {4} with idx {5} (rerr=({0},{1}) > ({2},{3}) )".format(reproj[0], reproj[1], se_threshold[0], se_threshold[1], view_id, pidx))
                                         sm.logInfo( "Predicted: {0}".format(calibrator.views[batch_id].rerrs[cidx][pidx].getPredictedMeasurement()) )
                                         sm.logInfo( "Measured: {0}".format(calibrator.views[batch_id].rerrs[cidx][pidx].getMeasurement()) )
 
@@ -357,7 +357,7 @@ def main():
                                 fig=pl.figure(view_id*100+batch_id+cidx)                                
                                 kcc.plotCornersAndReprojection(gridobs, reprojs[batch_id], cornerlist=cornerRemovalList, 
                                                                fno=fig.number, clearFigure=True, plotImage=True,
-                                                               title="Removing outliers in view {0} on cam {0}".format(view_id, cidx))
+                                                               title="Removing outliers in view {0} on cam {1}".format(view_id, cidx))
                                 pl.show()
     
                         #remove the corners (if there are corners to be removed)
@@ -412,10 +412,10 @@ def main():
             
             #generate report
             reportFile = "report-cam-" + bagtag + ".pdf"
-            G=None; 
+            G=None
             if numCams>1: 
                 G=graph
-            kcc.generateReport(calibrator, reportFile, showOnScreen=not parsed.dontShowReport, graph=G, removedOutlierCorners=removedOutlierCorners);
+            kcc.generateReport(calibrator, reportFile, showOnScreen=not parsed.dontShowReport, graph=G, removedOutlierCorners=removedOutlierCorners)
             
         except kcc.OptimizationDiverged:
             restartAttempts-=1

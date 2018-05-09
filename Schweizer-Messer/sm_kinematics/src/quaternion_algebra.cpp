@@ -100,7 +100,7 @@ namespace sm { namespace kinematics {
             return R;
         }
 
-
+        // Rq
         Eigen::Matrix4d quatPlus(Eigen::Vector4d const & q)
         {
             // [  q3,  q2, -q1, q0]
@@ -116,6 +116,7 @@ namespace sm { namespace kinematics {
             return Q;
         }
 
+        // Lq
         Eigen::Matrix4d quatOPlus(Eigen::Vector4d const & q)
         {
             // [  q3, -q2,  q1, q0]
@@ -133,6 +134,7 @@ namespace sm { namespace kinematics {
 
         }
 
+        // Rq * p = p * q
         Eigen::Vector4d qplus(Eigen::Vector4d const & q, Eigen::Vector4d const & p)
         {
             Eigen::Vector4d qplus_p;
@@ -148,6 +150,7 @@ namespace sm { namespace kinematics {
             return qplus_p;
         }
 
+        // Lq * p = q * p
         Eigen::Vector4d qoplus(Eigen::Vector4d const & q, Eigen::Vector4d const & p)
         {
             Eigen::Vector4d qoplus_p;
@@ -275,6 +278,7 @@ namespace sm { namespace kinematics {
         template Eigen::Matrix<double, 3, 1> quat2AxisAngle(Eigen::Matrix<double, 4, 1> const & q);
         template Eigen::Matrix<float, 3, 1> quat2AxisAngle(Eigen::Matrix<float, 4, 1> const & q);
 
+        // exp_q(h) = q * exp(h), dexp_q(h)/dh (0) = 1/2 Lq * [I3 0]^T = 1/2 Lq(:, 1:3)
         Eigen::Matrix<double,4,3> quatJacobian(Eigen::Vector4d const & p)
         {
             Eigen::Matrix<double,4,3> J;
@@ -282,7 +286,7 @@ namespace sm { namespace kinematics {
             // [  p2,  p3, -p0]
             // [ -p1,  p0,  p3]
             // [ -p0, -p1, -p2]
-    
+
             J(0,0) =  p[3];
             J(0,1) = -p[2];
             J(0,2) =  p[1];
@@ -299,6 +303,7 @@ namespace sm { namespace kinematics {
             return J*0.5;
         }
 
+        // q * exp(dq)
         Eigen::Vector4d updateQuat(Eigen::Vector4d const & q, Eigen::Vector3d const & dq)
         {
             // the following code is an optimized version of:
@@ -501,6 +506,7 @@ namespace sm { namespace kinematics {
         template Eigen::Matrix<double, 4,3> quatExpJacobian(const Eigen::Matrix<double, 3, 1>& vec);
         template Eigen::Matrix<float, 4,3> quatExpJacobian(const Eigen::Matrix<float, 3, 1>& vec);
 
+        // Jr^{-1}(\phi)
         template <typename Scalar_>
         Eigen::Matrix<Scalar_, 3, 3> logDiffMat(const Eigen::Matrix<Scalar_, 3, 1>  & vec){
           Scalar_ phi = vec.norm();
@@ -524,6 +530,7 @@ namespace sm { namespace kinematics {
         template Eigen::Matrix<double, 3, 3> logDiffMat<double>(const Eigen::Matrix<double, 3, 1>  &);
         template Eigen::Matrix<float, 3, 3> logDiffMat<float>(const Eigen::Matrix<float, 3, 1>  &);
 
+        // Jr^{-1}(\phi) * A,  A * dexp_q(h)/dh (0) = I
         template <typename Scalar_>
         Eigen::Matrix<Scalar_ , 3, 4> quatLogJacobian2(const Eigen::Matrix<Scalar_ , 4, 1>& p){
           return logDiffMat(quat2AxisAngle<>(p)) * (quatV<Scalar_>().transpose() * Scalar_(4.0)) * quatOPlus(quatInv(p.template cast<double>())).template cast<Scalar_>();

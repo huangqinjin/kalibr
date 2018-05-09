@@ -49,7 +49,7 @@ class IccCalibrator(object):
         self.CameraChain.addDesignVariables( problem, noTimeCalibration, noChainExtrinsics )
 
     def addPoseMotionTerms(self, problem, tv, rv):
-        wt = 1.0/tv;
+        wt = 1.0/tv
         wr = 1.0/rv
         W = np.diag([wt,wt,wt,wr,wr,wr])
         asp.addMotionErrorTerms(problem, self.poseDv, W, errorOrder)

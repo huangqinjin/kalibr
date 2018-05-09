@@ -194,7 +194,7 @@ class IccCamera():
         imu.GyroBiasPrior = (imu.GyroBiasPriorCount-1.0)/imu.GyroBiasPriorCount * imu.GyroBiasPrior + 1.0/imu.GyroBiasPriorCount*b_gyro
 
         #print result
-        print "  Orientation prior camera-imu found as: (T_i_c)"
+        print "  Orientation prior camera-imu found as: (R_i_c)"
         print R_i_c
         print "  Gyro bias prior found as: (b_gyro)"
         print b_gyro
@@ -282,7 +282,6 @@ class IccCamera():
         
         if np.isnan(curve).any():
             raise RuntimeError("Nans in curve values")
-            sys.exit(0)
         
         # Add 2 seconds on either end to allow the spline to slide during optimization
         times = np.hstack((times[0] - (timeOffsetPadding * 2.0), times, times[-1] + (timeOffsetPadding * 2.0)))
@@ -303,7 +302,7 @@ class IccCamera():
                 if dist < best_dist:
                     best_r = aa
                     best_dist = dist
-            curve[3:6,i] = best_r;
+            curve[3:6,i] = best_r
             
         seconds = times[-1] - times[0]
         knots = int(round(seconds * poseKnotsPerSecond))
@@ -747,9 +746,9 @@ class IccImu(object):
         self.gyroErrors = gyroErrors
 
     def initBiasSplines(self, poseSpline, splineOrder, biasKnotsPerSecond):
-        start = poseSpline.t_min();
-        end = poseSpline.t_max();
-        seconds = end - start;
+        start = poseSpline.t_min()
+        end = poseSpline.t_max()
+        seconds = end - start
         knots = int(round(seconds * biasKnotsPerSecond))
         
         print

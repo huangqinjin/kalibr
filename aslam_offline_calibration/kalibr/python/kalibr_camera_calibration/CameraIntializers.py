@@ -111,7 +111,7 @@ def stereoCalibrate(camL_geometry, camH_geometry, obslist, distortionActive=Fals
                     T_cam_w =  baseline_dv.toExpression() * T_cam_w
                     
                 for i in range(0, target.size()):
-                    p_target = aopt.HomogeneousExpression(sm.toHomogeneous(target.point(i)));
+                    p_target = aopt.HomogeneousExpression(sm.toHomogeneous(target.point(i)))
                     valid, y = obs.imagePoint(i)
                     if valid:
                         # Create an error term.
@@ -181,7 +181,7 @@ def stereoCalibrate(camL_geometry, camH_geometry, obslist, distortionActive=Fals
         baseline_HL = sm.Transformation(baseline_dv.toTransformationMatrix())
         return success, baseline_HL
     else:
-        #return the intiial guess if we fail
+        #return the initial guess if we fail
         return success, baseline_HL
 
 
@@ -213,7 +213,7 @@ def calibrateIntrinsics(cam_geometry, obslist, distortionActive=True, intrinsics
     target = cam_geometry.ctarget.detector.target()
     
     #target pose dv for all target views (=T_camL_w)
-    reprojectionErrors = [];    
+    reprojectionErrors = []
     sm.logDebug("calibrateIntrinsics: adding camera error terms for {0} calibration targets".format(len(obslist)))
     target_pose_dvs=list()
     for obs in obslist: 
@@ -225,7 +225,7 @@ def calibrateIntrinsics(cam_geometry, obslist, distortionActive=True, intrinsics
     
         ## add error terms
         for i in range(0, target.size()):
-            p_target = aopt.HomogeneousExpression(sm.toHomogeneous(target.point(i)));
+            p_target = aopt.HomogeneousExpression(sm.toHomogeneous(target.point(i)))
             valid, y = obs.imagePoint(i)
             if valid:
                 rerr = cam_geometry.model.reprojectionError(y, invR, T_cam_w * p_target, cam_geometry.dv)
@@ -309,7 +309,7 @@ def solveFullBatch(cameras, baseline_guesses, graph):
     target_pose_dvs = list()
       
     #shuffle the views
-    reprojectionErrors = [];    
+    reprojectionErrors = []
     timestamps = graph.obs_db.getAllViewTimestamps()
     for view_id, timestamp in enumerate(timestamps):
         
@@ -336,7 +336,7 @@ def solveFullBatch(cameras, baseline_guesses, graph):
         
             ## add error terms
             for i in range(0, target.size()):
-                p_target = aopt.HomogeneousExpression(sm.toHomogeneous(target.point(i)));
+                p_target = aopt.HomogeneousExpression(sm.toHomogeneous(target.point(i)))
                 valid, y = obs.imagePoint(i)
                 if valid:
                     rerr = cameras[cidx].model.reprojectionError(y, invR, T_camN_calib * p_target, cameras[cidx].dv)

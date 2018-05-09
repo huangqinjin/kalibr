@@ -179,7 +179,7 @@ class RsCalibrator(object):
                 )
                 # if no new knotlist was generated, we are done.
                 if (not requiresUpdate):
-                    break;
+                    break
 
                 # otherwise update the spline dv and rebuild the problem
                 self.__poseSpline = knotUpdateStrategy.getUpdatedSpline(self.__poseSpline_dv.spline(), knots, self.__config.splineOrder)
@@ -202,7 +202,7 @@ class RsCalibrator(object):
             if (success):
                 observation.set_T_t_c(T_t_c)
             else:
-                sm.logWarn("Could not estimate T_t_c for observation at index" . idx)
+                sm.logWarn("Could not estimate T_t_c for observation at index {}".format(idx))
 
         return
 
@@ -237,7 +237,6 @@ class RsCalibrator(object):
         # make sure all values are well defined
         if np.isnan(curve).any():
             raise RuntimeError("Nans in curve values")
-            sys.exit(0)
         # Add 2 seconds on either end to allow the spline to slide during optimization
         times = np.hstack((times[0] - (timeOffsetPadding * 2.0), times, times[-1] + (timeOffsetPadding * 2.0)))
         curve = np.hstack((curve[:,0], curve, curve[:,-1]))
@@ -283,7 +282,7 @@ class RsCalibrator(object):
         for landmark in self.__observations[0].getCornersTargetFrame():
             # design variable for landmark
             landmark_w_dv = aopt.HomogeneousPointDv(sm.toHomogeneous(landmark))
-            landmark_w_dv.setActive(self.__config.estimateParameters['landmarks']);
+            landmark_w_dv.setActive(self.__config.estimateParameters['landmarks'])
             landmarks.append(landmark_w_dv)
             landmarks_expr.append(landmark_w_dv.toExpression())
             problem.addDesignVariable(landmark_w_dv, CALIBRATION_GROUP_ID)
@@ -326,21 +325,21 @@ class RsCalibrator(object):
                     # keypoint time offset by line delay as expression type
                     keypoint_time = self.__camera_dv.keypointTime(frame.time(), point)
 
-                    # from target to world transformation.
-                    T_w_t = self.__poseSpline_dv.transformationAtTime(
+                    # from camera to target transformation.
+                    T_t_c = self.__poseSpline_dv.transformationAtTime(
                         keypoint_time,
                         self.__config.timeOffsetConstantSparsityPattern,
                         self.__config.timeOffsetConstantSparsityPattern
                     )
-                    T_t_w = T_w_t.inverse()
+                    T_c_t = T_t_c.inverse()
 
                     # transform target point to camera frame
-                    p_t = T_t_w * landmarks_expr[index]
+                    p_c = T_c_t * landmarks_expr[index]
 
                     # create the keypoint
                     keypoint = acv.Keypoint2()
                     keypoint.setMeasurement(point)
-                    inverseFeatureCovariance = self.__config.inverseFeatureCovariance;
+                    inverseFeatureCovariance = self.__config.inverseFeatureCovariance
                     keypoint.setInverseMeasurementCovariance(np.eye(len(point)) * inverseFeatureCovariance)
                     keypoint.setLandmarkId(index)
                     frame.addKeypoint(keypoint)
@@ -350,7 +349,7 @@ class RsCalibrator(object):
                     reprojection_error = self.__buildErrorTerm(
                         frame,
                         keypoint_index,
-                        p_t,
+                        p_c,
                         self.__camera_dv,
                         self.__poseSpline_dv
                     )
@@ -400,7 +399,7 @@ class RsCalibrator(object):
                 if dist < best_dist:
                     best_r = aa
                     best_dist = dist
-            curve[3:6,i] = best_r;
+            curve[3:6,i] = best_r
 
     def __initPoseDesignVariables(self, problem):
         """Get the design variable representation of the pose spline and add them to the problem"""

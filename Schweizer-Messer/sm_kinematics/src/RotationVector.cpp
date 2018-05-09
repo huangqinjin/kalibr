@@ -7,6 +7,7 @@ namespace sm { namespace kinematics {
 
         }
     
+        // exp(-\theta)
         Eigen::Matrix3d RotationVector::parametersToRotationMatrix(const Eigen::Vector3d & parameters, Eigen::Matrix3d * S) const
         {
             Eigen::Matrix3d C;
@@ -54,6 +55,7 @@ namespace sm { namespace kinematics {
             return C;
         }
 
+        // -log(R)
         Eigen::Vector3d RotationVector::rotationMatrixToParameters(const Eigen::Matrix3d & C) const
         {
             Eigen::Vector3d p;
@@ -79,6 +81,7 @@ namespace sm { namespace kinematics {
             return p;
         }
 
+        // Jr(\theta)
         Eigen::Matrix3d RotationVector::parametersToSMatrix(const Eigen::Vector3d & parameters) const
         {
             Eigen::Matrix3d S;

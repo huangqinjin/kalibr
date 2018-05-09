@@ -89,7 +89,7 @@ class ReprojectionErrorKnotSequenceUpdateStrategy(object):
             times.append(reprojection_error.observationTime())
             errors.append(reprojection_error.evaluateError())
 
-        # it is not guaranteed that the errors are sorted in tiem
+        # it is not guaranteed that the errors are sorted in time
         newIdx = sorted(range(len(times)),key=times.__getitem__)
         times = [ times[i] for i in newIdx]
         errors = [ errors[i] for i in newIdx]

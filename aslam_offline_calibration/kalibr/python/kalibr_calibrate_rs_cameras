@@ -12,7 +12,6 @@ import kalibr_common as kc
 import kalibr_camera_calibration as kcc
 import kalibr_rs_camera_calibration as rscc
 
-import cv
 import cv2
 import os
 import numpy as np
@@ -126,7 +125,7 @@ def __parseArgs():
 def __extractObservations(cameraGeometry, verbose=False):
 
     # extract the targets
-    multithreading = False #not verbose
+    multithreading = True #not verbose
     observations = kc.extractCornersFromDataset(
         cameraGeometry.dataset,
         cameraGeometry.ctarget.detector,
@@ -175,9 +174,5 @@ def main():
     calibrator.calibrate(cameraGeometry, observations, config)
 
 if __name__ == "__main__":
-    try:
-        main()
-    except Exception,e:
-        sm.logError("Exception: {0}".format(e))
-        sys.exit(-1)
+    main()
 

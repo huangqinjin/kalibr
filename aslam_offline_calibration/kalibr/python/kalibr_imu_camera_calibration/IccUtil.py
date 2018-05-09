@@ -177,7 +177,7 @@ def generateReport(cself, filename="report.pdf", showOnScreen=True):
     if cself.CameraChain:        
         for cidx, cam in enumerate(cself.CameraChain.camList):
             f = pl.figure(offset+cidx)
-            title="cam{0}: reprojection errors".format(cidx);
+            title="cam{0}: reprojection errors".format(cidx)
             plots.plotReprojectionScatter(cself, cidx, fno=f.number, noShow=True, title=title)
             plotter.add_figure(title, f)
             figs.append(f)

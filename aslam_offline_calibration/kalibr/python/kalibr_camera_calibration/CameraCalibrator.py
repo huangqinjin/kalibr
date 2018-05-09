@@ -132,7 +132,7 @@ class CalibrationTarget(object):
         P_t_dv = []
         P_t_ex = []
         for i in range(0,self.target.size()):
-            p_t_dv = aopt.HomogeneousPointDv(sm.toHomogeneous(self.target.point(i)));
+            p_t_dv = aopt.HomogeneousPointDv(sm.toHomogeneous(self.target.point(i)))
             p_t_dv.setActive(estimateLandmarks)
             p_t_ex = p_t_dv.toExpression()
             P_t_dv.append(p_t_dv)
@@ -293,7 +293,7 @@ def getImageCenterRay(cself, cam_id):
     projection = geometry.projection()
     yc = np.array( [ projection.cu(), projection.cv() ] )
     vc = normalize(geometry.keypointToEuclidean(yc))
-    return vc;
+    return vc
 
 class pointStatistics(object):
     pass
@@ -363,7 +363,7 @@ def getReprojectionErrorStatistics(all_rerrs):
         raise RuntimeError("rerrs has invalid dimension")
 
     gc.disable() #append speed up
-    rerr_matrix=list();
+    rerr_matrix=list()
     for view_id, view_rerrs in enumerate(all_rerrs):
         if view_rerrs is not None: #if cam sees target in this view
             for rerr in view_rerrs:
@@ -442,12 +442,12 @@ def plotPolarError(cself, cam_id, fno=1, clearFigure=True, stats=None, noShow=Fa
         
     pl.subplot(121)
     pl.plot(sae[:,0],sae[:,1],'bx-')
-    pl.grid('on')
+    pl.grid(True)
     pl.xlabel('polar angle (deg)')
     pl.ylabel('reprojection error (pixels)')
     pl.subplot(122)
     pl.hist(sae[:,0])
-    pl.grid('on')
+    pl.grid(True)
     pl.xlabel('polar angle (deg)')
     pl.ylabel('count')
     if not noShow:
@@ -467,12 +467,12 @@ def plotAzumithalError(cself, cam_id, fno=1, clearFigure=True, stats=None, noSho
     
     pl.subplot(121)
     pl.plot(sae[:,0],sae[:,1],'bx-')
-    pl.grid('on')
+    pl.grid(True)
     pl.xlabel('azumithal angle (deg)')
     pl.ylabel('reprojection error (pixels)')
     pl.subplot(122)
     pl.hist(sae[:,0])
-    pl.grid('on')
+    pl.grid(True)
     pl.xlabel('azumithal angle (deg)')
     pl.ylabel('count')
     if not noShow:
@@ -512,12 +512,12 @@ def plotAllReprojectionErrors(cself, cam_id, fno=1, noShow=False, clearFigure=Tr
             pl.plot(rerrs[:,0], rerrs[:,1], 'x', lw=3, mew=3, color=color)
 
     pl.axis('equal')
-    pl.grid('on')
+    pl.grid(True)
     pl.xlabel('error x (pix)')
     pl.ylabel('error y (pix)')
 
     SM = pl.cm.ScalarMappable(pl.cm.colors.Normalize(0.0,len(cself.views)), pl.cm.jet)
-    SM.set_array(np.arange(len(cself.views)));
+    SM.set_array(np.arange(len(cself.views)))
     cb = pl.colorbar(SM)
     cb.set_label('image index')
     if not noShow:
@@ -735,7 +735,7 @@ def generateReport(cself, filename="report.pdf", showOnScreen=True, graph=None, 
     #plot graph
     if graph is not None:
         f=pl.figure(1001)
-        title="Inter-camera observations graph (edge weight=#mutual obs.)";
+        title="Inter-camera observations graph (edge weight=#mutual obs.)"
         graph.plotGraphPylab(fno=f.number, noShow=True, title=title)
         plotter.add_figure("Obs. graph", f)
         figs.append(f)
@@ -787,7 +787,7 @@ def generateReport(cself, filename="report.pdf", showOnScreen=True, graph=None, 
     
 def plotCorners(gridobs, fno=1, cornerlist=None, clearFigure=True, plotImage=True, color=None, subplot=0):
     if color is None:
-        color = [0,1,1,0.3];
+        color = [0,1,1,0.3]
     f = pl.figure(fno)
     if subplot>0:
         pl.subplot(subplot)

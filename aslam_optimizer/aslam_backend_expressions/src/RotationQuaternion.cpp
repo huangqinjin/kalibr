@@ -89,6 +89,9 @@ namespace aslam {
      // compute the evaluation point:
      Eigen::Vector4d quatHat(xHat(0,0),xHat(1,0),xHat(2,0),xHat(3,0));
      Eigen::Vector4d evalPoint= sm::kinematics::qplus(_q, sm::kinematics::quatInv(quatHat));
+
+     // log(q) : Sp(1)->R^3,  log(q * exp(h)) = log(q) + Jr(log(q))^{-1}h
+     // outJacobian is at q * exp(h) not at q ???
      outJacobian = sm::kinematics::quatLogJacobian2(evalPoint)*sm::kinematics::quatJacobian(evalPoint); //???
     }
 

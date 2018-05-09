@@ -31,6 +31,16 @@ boost::python::tuple transformationAndJacobianWrapper(const bsplines::BSplinePos
   return boost::python::make_tuple(T,J,I);
 }
 
+boost::python::tuple transformVectorAndJacobianWrapper(const bsplines::BSplinePose * bsp, double t, const Eigen::VectorXd& v)
+{
+  Eigen::MatrixXd J;
+  Eigen::VectorXi I;
+  Eigen::Vector4d vv(v[0], v[1], v[2], v[3]);
+  vv = bsp->transformVectorAndJacobian(t, vv, &J, &I);
+
+  return boost::python::make_tuple(vv,J,I);
+}
+
 boost::python::tuple inverseTransformationAndJacobianWrapper(const bsplines::BSplinePose * bsp, double t)
 {
   Eigen::MatrixXd J;
@@ -106,6 +116,7 @@ void import_bspline_pose_python()
     .def("curveValueToTransformation", &BSplinePose::curveValueToTransformation)
     .def("transformationToCurveValue", &BSplinePose::transformationToCurveValue)
     .def("transformationAndJacobian",  &transformationAndJacobianWrapper)
+    .def("transformVectorAndJacobian",  &transformVectorAndJacobianWrapper)
     .def("orientation",  &BSplinePose::orientation)
     .def("orientationAndJacobian",  &orientationAndJacobianWrapper)
     .def("inverseOrientation",  &BSplinePose::inverseOrientation)

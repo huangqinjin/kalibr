@@ -13,7 +13,7 @@ def plotGyroError(cself, iidx, fno=1, clearFigure=True, noShow=False):
     pl.plot(errors)
     pl.xlabel('error index')
     pl.ylabel('error (rad/sec) squared')
-    pl.grid('on')
+    pl.grid(True)
     
     #only plot till 5*sigma  (output formatting...)
     sigma=np.std(errors)
@@ -23,7 +23,7 @@ def plotGyroError(cself, iidx, fno=1, clearFigure=True, noShow=False):
     pl.hist(errors, len(errors)/100)
     pl.xlabel('error ($rad/s$) squared')
     pl.ylabel('error index')
-    pl.grid('on')
+    pl.grid(True)
 
 def plotGyroErrorPerAxis(cself, iidx, fno=1, clearFigure=True, noShow=False):
     errors = np.array([re.error() for re in  cself.ImuList[iidx].gyroErrors])
@@ -38,7 +38,7 @@ def plotGyroErrorPerAxis(cself, iidx, fno=1, clearFigure=True, noShow=False):
         pl.plot(errors[:,i])
         pl.xlabel('error index')
         pl.ylabel('error ($rad/s$)')
-        pl.grid('on')
+        pl.grid(True)
         sigma = cself.ImuList[iidx].getImuConfig().getGyroStatistics()[0]
         pl.plot(np.array([0., errors.shape[0]]), sigma * 3.* np.ones(2), 'r--')
         pl.plot(np.array([0., errors.shape[0]]), -sigma * 3.* np.ones(2), 'r--')
@@ -56,7 +56,7 @@ def plotAccelError(cself, iidx, fno=1, clearFigure=True, noShow=False):
     pl.plot(errors)
     pl.xlabel('error index')
     pl.ylabel('(m/sec*sec) squared')
-    pl.grid('on')
+    pl.grid(True)
     
     #only plot till 5*sigma  (output formatting...)
     sigma=np.std(errors)
@@ -66,7 +66,7 @@ def plotAccelError(cself, iidx, fno=1, clearFigure=True, noShow=False):
     pl.hist(errors, len(errors)/100)
     pl.xlabel('($m/s^2$) squared')
     pl.ylabel('Error Number')
-    pl.grid('on')
+    pl.grid(True)
 
 def plotAccelErrorPerAxis(cself, iidx, fno=1, clearFigure=True, noShow=False):
     errors = np.array([re.error() for re in  cself.ImuList[iidx].accelErrors])
@@ -81,7 +81,7 @@ def plotAccelErrorPerAxis(cself, iidx, fno=1, clearFigure=True, noShow=False):
         pl.plot(errors[:,i])
         pl.xlabel('error index')
         pl.ylabel('error ($m/s^2$)')
-        pl.grid('on')
+        pl.grid(True)
         sigma = cself.ImuList[iidx].getImuConfig().getAccelerometerStatistics()[0]
         pl.plot(np.array([0, errors.shape[0]]), sigma * 3.* np.ones(2), 'r--')
         pl.plot(np.array([0, errors.shape[0]]), -sigma * 3.* np.ones(2), 'r--')
@@ -196,7 +196,7 @@ def plotVectorOverTime(times, values, title="", ylabel="", label="", fno=1, clea
     for r in range(0,3):
         pl.subplot(3, 1, r+1)
         pl.plot(times, values[r,:], 'b-', lw=lw, label=label)
-        pl.grid('on')
+        pl.grid(True)
         pl.xlabel("time (s)")
         pl.ylabel(ylabel)
         if label is not "":
@@ -227,11 +227,11 @@ def plotReprojectionScatter(cself, cam_id, fno=1, clearFigure=True, noShow=False
     f.gca().add_artist(uncertainty_bound)
 
     pl.axis('equal')
-    pl.grid('on')
+    pl.grid(True)
     pl.xlabel('error x ($pix$)')
     pl.ylabel('error y ($pix$)')
     SM = pl.cm.ScalarMappable(pl.cm.colors.Normalize(0.0,numImages), pl.cm.jet)
-    SM.set_array(np.arange(numImages));
+    SM.set_array(np.arange(numImages))
     cb = pl.colorbar(SM)
     cb.set_label('image index')
     if not noShow:

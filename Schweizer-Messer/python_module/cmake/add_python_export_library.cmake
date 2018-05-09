@@ -115,10 +115,12 @@ ${SETUP_PY_TEXT}
   get_filename_component(PYLIB_OUTPUT_NAME ${PYLIB_OUTPUT_FILE} NAME_WE)
   set(PYLIB_SO_NAME ${PYLIB_OUTPUT_NAME}.so)
 
-  if(APPLE)
-    SET(DIST_DIR site-packages)
+  # https://stackoverflow.com/questions/9387928/whats-the-difference-between-dist-packages-and-site-packages
+  # dist-packages is a Debian-specific convention
+  if(EXISTS /etc/debconf.conf)
+    set(DIST_DIR dist-packages)
   else()
-    SET(DIST_DIR dist-packages)
+    set(DIST_DIR site-packages)
   endif()
 
   install(TARGETS ${TARGET_NAME}

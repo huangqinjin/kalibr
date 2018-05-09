@@ -124,7 +124,7 @@ def parseArgs():
 
 def main():
     # Parse the arguments
-    parsed = parseArgs();
+    parsed = parseArgs()
     
     #logging modess
     if parsed.verbose:
