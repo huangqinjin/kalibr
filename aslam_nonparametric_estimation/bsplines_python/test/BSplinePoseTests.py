@@ -46,13 +46,10 @@ class TestBSplinePose(unittest.TestCase):
                 for t in numpy.linspace(bsp.t_min(), bsp.t_max(), 4):
                     # Create a random homogeneous vector
                     v = numpy.random.random(4)
-                    TJI = bsp.transformationAndJacobian(t);
-                    #print "TJI: %s" % (TJI)
+                    vJI = bsp.transformVectorAndJacobian(t, v)
                     je = nd.Jacobian(lambda c: bsp.setLocalCoefficientVector(t,c) or numpy.dot(bsp.transformation(t), v))
                     estJ = je(bsp.localCoefficientVector(t))
-                    JT = TJI[1]
-                    J = numpy.dot(sm.boxMinus(numpy.dot(TJI[0],v)), JT)                    
-                    self.assertMatricesEqual(J, estJ, 1e-9,"T_n_0")
+                    self.assertMatricesEqual(vJI[1], estJ, 1e-9,"T_n_0")
     def testOrientationJacobian(self):
         rvs = (sm.RotationVector(), sm.EulerAnglesZYX(), sm.EulerRodriguez())
         for r in rvs:
@@ -67,7 +64,7 @@ class TestBSplinePose(unittest.TestCase):
                 for t in numpy.linspace(bsp.t_min(), bsp.t_max(), 4):
                     # Create a random homogeneous vector
                     v = numpy.random.random(3)
-                    CJI = bsp.orientationAndJacobian(t);
+                    CJI = bsp.orientationAndJacobian(t)
                     #print "TJI: %s" % (TJI)
                     je = nd.Jacobian(lambda c: bsp.setLocalCoefficientVector(t,c) or numpy.dot(bsp.orientation(t), v))
                     estJ = je(bsp.localCoefficientVector(t))
@@ -88,8 +85,8 @@ class TestBSplinePose(unittest.TestCase):
                 
                 for t in numpy.linspace(bsp.t_min(), bsp.t_max(), 4):
                     # Create a random homogeneous vector
-                    v = numpy.random.random(3)
-                    CJI = bsp.inverseOrientationAndJacobian(t);
+                    v = numpy.random.random(3) 
+                    CJI = bsp.inverseOrientationAndJacobian(t)
                     #print "TJI: %s" % (TJI)
                     je = nd.Jacobian(lambda c: bsp.setLocalCoefficientVector(t,c) or numpy.dot(bsp.inverseOrientation(t), v))
                     estJ = je(bsp.localCoefficientVector(t))
@@ -99,7 +96,7 @@ class TestBSplinePose(unittest.TestCase):
 
 
     def testAngualrVelocityJacobian(self):
-        r = sm.EulerAnglesZYX();
+        r = sm.EulerAnglesZYX()
         for order in range(2,7):
             bsp = bsplines.BSplinePose(order,r)
             T_n_0 = bsp.curveValueToTransformation(numpy.random.random(6))
@@ -110,7 +107,8 @@ class TestBSplinePose(unittest.TestCase):
                 
             for t in numpy.linspace(bsp.t_min(), bsp.t_max(), 4):
                 
-                oJI = bsp.angularVelocityAndJacobian(t);
+                oJI = bsp.angularVelocityAndJacobian(t)
+                self.assertMatricesEqual(bsp.angularVelocity(t), oJI[0], 1e-9,"omega Jacobian")
                 #print "TJI: %s" % (TJI)
                 je = nd.Jacobian(lambda c: bsp.setLocalCoefficientVector(t,c) or bsp.angularVelocity(t))
                 estJ = je(bsp.localCoefficientVector(t))
@@ -119,7 +117,7 @@ class TestBSplinePose(unittest.TestCase):
                 self.assertMatricesEqual(J, estJ, 1e-9,"omega Jacobian")
 
     def testAngularVelocityBodyFrameJacobian(self):
-        r = sm.EulerAnglesZYX();
+        r = sm.EulerAnglesZYX()
         for order in range(2,7):
             bsp = bsplines.BSplinePose(order,r)
             T_n_0 = bsp.curveValueToTransformation(numpy.random.random(6))
@@ -130,7 +128,8 @@ class TestBSplinePose(unittest.TestCase):
                 
             for t in numpy.linspace(bsp.t_min(), bsp.t_max(), 4):
                 
-                oJI = bsp.angularVelocityBodyFrameAndJacobian(t);
+                oJI = bsp.angularVelocityBodyFrameAndJacobian(t)
+                self.assertMatricesEqual(bsp.angularVelocityBodyFrame(t), oJI[0], 1e-9,"omega Jacobian")
                 #print "TJI: %s" % (TJI)
                 je = nd.Jacobian(lambda c: bsp.setLocalCoefficientVector(t,c) or bsp.angularVelocityBodyFrame(t))
                 estJ = je(bsp.localCoefficientVector(t))
@@ -148,31 +147,31 @@ class TestBSplinePose(unittest.TestCase):
         # Initialize the curve.
         bsp.initPoseSpline(0.0,1.0,T_n_0, T_n_1)
         # Check the values.
-        self.assertEqual(bsp.t_min(),0.0);
-        self.assertEqual(bsp.t_max(),1.0);
+        self.assertEqual(bsp.t_min(),0.0)
+        self.assertEqual(bsp.t_max(),1.0)
 
-        curve_T_n_0 = bsp.transformation(0.0);
+        curve_T_n_0 = bsp.transformation(0.0)
         self.assertMatricesEqual(T_n_0, curve_T_n_0, 1e-9,"T_n_0")
 
-        curve_T_n_1 = bsp.transformation(1.0);
+        curve_T_n_1 = bsp.transformation(1.0)
         self.assertMatricesEqual(T_n_1, curve_T_n_1, 1e-9,"T_n_1")
 
         tend = 2.0
         # Extend the segment.
         T_n_25 = bsp.curveValueToTransformation(numpy.random.random(6))
-        bsp.addPoseSegment(tend, T_n_25);
+        bsp.addPoseSegment(tend, T_n_25)
 
         # Check the values.
-        self.assertEqual(bsp.t_min(),0.0);
-        self.assertEqual(bsp.t_max(),tend);
+        self.assertEqual(bsp.t_min(),0.0)
+        self.assertEqual(bsp.t_max(),tend)
 
-        curve_T_n_0 = bsp.transformation(0.0);
+        curve_T_n_0 = bsp.transformation(0.0)
         self.assertMatricesEqual(T_n_0, curve_T_n_0, 1e-6, "T_n_0")
 
-        curve_T_n_1 = bsp.transformation(1.0);
+        curve_T_n_1 = bsp.transformation(1.0)
         self.assertMatricesEqual(T_n_1, curve_T_n_1, 1e-4, "T_n_1")
         
-        curve_T_n_25 = bsp.transformation(tend);
+        curve_T_n_25 = bsp.transformation(tend)
         self.assertMatricesEqual(T_n_25, curve_T_n_25, 1e-4, "T_n_25")
     def testAngularVelocity(self):
         bsp = bsplines.BSplinePose(4,sm.EulerAnglesZYX())
