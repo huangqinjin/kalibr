@@ -96,47 +96,124 @@ class TestBSplinePose(unittest.TestCase):
 
 
     def testAngualrVelocityJacobian(self):
-        r = sm.EulerAnglesZYX()
-        for order in range(2,7):
-            bsp = bsplines.BSplinePose(order,r)
-            T_n_0 = bsp.curveValueToTransformation(numpy.random.random(6))
-            T_n_1 = bsp.curveValueToTransformation(numpy.random.random(6))
-                
-            # Initialize the curve.
-            bsp.initPoseSpline(0.0,1.0,T_n_0, T_n_1)
-                
-            for t in numpy.linspace(bsp.t_min(), bsp.t_max(), 4):
-                
-                oJI = bsp.angularVelocityAndJacobian(t)
-                self.assertMatricesEqual(bsp.angularVelocity(t), oJI[0], 1e-9,"omega Jacobian")
-                #print "TJI: %s" % (TJI)
-                je = nd.Jacobian(lambda c: bsp.setLocalCoefficientVector(t,c) or bsp.angularVelocity(t))
-                estJ = je(bsp.localCoefficientVector(t))
-                J = oJI[1]
-                
-                self.assertMatricesEqual(J, estJ, 1e-9,"omega Jacobian")
+        rvs = (sm.RotationVector(), sm.EulerAnglesZYX(), sm.EulerRodriguez())
+        for r in rvs:
+            for order in range(2,7):
+                bsp = bsplines.BSplinePose(order,r)
+                T_n_0 = bsp.curveValueToTransformation(numpy.random.random(6))
+                T_n_1 = bsp.curveValueToTransformation(numpy.random.random(6))
+                    
+                # Initialize the curve.
+                bsp.initPoseSpline(0.0,1.0,T_n_0, T_n_1)
+                    
+                for t in numpy.linspace(bsp.t_min(), bsp.t_max(), 4):
+                    
+                    oJI = bsp.angularVelocityAndJacobian(t)
+                    self.assertMatricesEqual(bsp.angularVelocity(t), oJI[0], 1e-9,"angular velocity")
+                    #print "TJI: %s" % (TJI)
+                    je = nd.Jacobian(lambda c: bsp.setLocalCoefficientVector(t,c) or bsp.angularVelocity(t))
+                    estJ = je(bsp.localCoefficientVector(t))
+                    J = oJI[1]
+                    
+                    self.assertMatricesEqual(J, estJ, 1e-9,"omega Jacobian")
 
     def testAngularVelocityBodyFrameJacobian(self):
-        r = sm.EulerAnglesZYX()
-        for order in range(2,7):
-            bsp = bsplines.BSplinePose(order,r)
-            T_n_0 = bsp.curveValueToTransformation(numpy.random.random(6))
-            T_n_1 = bsp.curveValueToTransformation(numpy.random.random(6))
-                
-            # Initialize the curve.
-            bsp.initPoseSpline(0.0,1.0,T_n_0, T_n_1)
-                
-            for t in numpy.linspace(bsp.t_min(), bsp.t_max(), 4):
-                
-                oJI = bsp.angularVelocityBodyFrameAndJacobian(t)
-                self.assertMatricesEqual(bsp.angularVelocityBodyFrame(t), oJI[0], 1e-9,"omega Jacobian")
-                #print "TJI: %s" % (TJI)
-                je = nd.Jacobian(lambda c: bsp.setLocalCoefficientVector(t,c) or bsp.angularVelocityBodyFrame(t))
-                estJ = je(bsp.localCoefficientVector(t))
-                J = oJI[1]
-                
-                self.assertMatricesEqual(J, estJ, 1e-9,"omega Jacobian")
+        rvs = (sm.RotationVector(), sm.EulerAnglesZYX(), sm.EulerRodriguez())
+        for r in rvs:
+            for order in range(2,7):
+                bsp = bsplines.BSplinePose(order,r)
+                T_n_0 = bsp.curveValueToTransformation(numpy.random.random(6))
+                T_n_1 = bsp.curveValueToTransformation(numpy.random.random(6))
+                    
+                # Initialize the curve.
+                bsp.initPoseSpline(0.0,1.0,T_n_0, T_n_1)
+                    
+                for t in numpy.linspace(bsp.t_min(), bsp.t_max(), 4):
+                    
+                    oJI = bsp.angularVelocityBodyFrameAndJacobian(t)
+                    self.assertMatricesEqual(bsp.angularVelocityBodyFrame(t), oJI[0], 1e-9,"angular velocity")
+                    #print "TJI: %s" % (TJI)
+                    je = nd.Jacobian(lambda c: bsp.setLocalCoefficientVector(t,c) or bsp.angularVelocityBodyFrame(t))
+                    estJ = je(bsp.localCoefficientVector(t))
+                    J = oJI[1]
+                    
+                    self.assertMatricesEqual(J, estJ, 1e-9,"omega Jacobian")
 
+    def testAngularAccelerationBodyFrame(self):
+        rvs = (sm.RotationVector(), sm.EulerAnglesZYX(), sm.EulerRodriguez())
+        for r in rvs:
+            for order in range(2,7):
+                bsp = bsplines.BSplinePose(order,r)
+                T_n_0 = bsp.curveValueToTransformation(numpy.random.random(6))
+                T_n_1 = bsp.curveValueToTransformation(numpy.random.random(6))
+                    
+                # Initialize the curve.
+                bsp.initPoseSpline(0.0,100.0,T_n_0, T_n_1)
+                gap = (bsp.t_max() - bsp.t_min()) / 8
+                for t in numpy.linspace(bsp.t_min() + gap, bsp.t_max() - gap, 100):
+             
+                    je = nd.Jacobian(lambda t: bsp.angularVelocityBodyFrame(t[0]))
+                    self.assertMatricesEqual(je(t)[0], bsp.angularAccelerationBodyFrame(t), 1e-9,"angular acceleration")
+
+    def testAngularAccelerationBodyFrameJacobian(self):
+        rvs = (sm.RotationVector(), )
+        for r in rvs:
+            for order in range(2,7):
+                bsp = bsplines.BSplinePose(order,r)
+                T_n_0 = bsp.curveValueToTransformation(numpy.random.random(6))
+                T_n_1 = bsp.curveValueToTransformation(numpy.random.random(6))
+                    
+                # Initialize the curve.
+                bsp.initPoseSpline(0.0,1.0,T_n_0, T_n_1)
+                for t in numpy.linspace(bsp.t_min(), bsp.t_max(), 4):
+                    
+                    aJI = bsp.angularAccelerationBodyFrameAndJacobian(t)
+                    self.assertMatricesEqual(bsp.angularAccelerationBodyFrame(t), aJI[0], 1e-9,"angular acceleration")
+ 
+                    #print "TJI: %s" % (TJI)
+                    je = nd.Jacobian(lambda c: bsp.setLocalCoefficientVector(t,c) or bsp.angularAccelerationBodyFrame(t))
+                    estJ = je(bsp.localCoefficientVector(t))
+                    J = aJI[1]
+                    
+                    self.assertMatricesEqual(J, estJ, 1e-9,"acceleration Jacobian")
+
+    def testAngularAcceleration(self):
+        rvs = (sm.RotationVector(), sm.EulerAnglesZYX(), sm.EulerRodriguez())
+        for r in rvs:
+            for order in range(2,7):
+                bsp = bsplines.BSplinePose(order,r)
+                T_n_0 = bsp.curveValueToTransformation(numpy.random.random(6))
+                T_n_1 = bsp.curveValueToTransformation(numpy.random.random(6))
+                    
+                # Initialize the curve.
+                bsp.initPoseSpline(0.0,100.0,T_n_0, T_n_1)
+                gap = (bsp.t_max() - bsp.t_min()) / 8
+                for t in numpy.linspace(bsp.t_min() + gap, bsp.t_max() - gap, 100):
+             
+                    je = nd.Jacobian(lambda t: bsp.angularVelocity(t[0]))
+                    self.assertMatricesEqual(je(t)[0], bsp.angularAcceleration(t), 1e-9,"angular acceleration")
+
+    def testAngularAccelerationJacobian(self):
+        rvs = (sm.RotationVector(), )
+        for r in rvs:
+            for order in range(2,7):
+                bsp = bsplines.BSplinePose(order,r)
+                T_n_0 = bsp.curveValueToTransformation(numpy.random.random(6))
+                T_n_1 = bsp.curveValueToTransformation(numpy.random.random(6))
+                    
+                # Initialize the curve.
+                bsp.initPoseSpline(0.0,1.0,T_n_0, T_n_1)
+                for t in numpy.linspace(bsp.t_min(), bsp.t_max(), 4):
+                    
+                    aJI = bsp.angularAccelerationAndJacobian(t)
+                    self.assertMatricesEqual(bsp.angularAcceleration(t), aJI[0], 1e-9,"angular acceleration")
+ 
+                    #print "TJI: %s" % (TJI)
+                    je = nd.Jacobian(lambda c: bsp.setLocalCoefficientVector(t,c) or bsp.angularAcceleration(t))
+                    estJ = je(bsp.localCoefficientVector(t))
+                    J = aJI[1]
+                    
+                    self.assertMatricesEqual(J, estJ, 1e-9,"acceleration Jacobian")
     
     def testInitPose(self):
         bsp = bsplines.BSplinePose(4,sm.RotationVector())
