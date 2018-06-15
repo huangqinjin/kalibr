@@ -57,6 +57,13 @@ class IrscCamera():
         #initialize the camera data
         self.camera = kc.AslamCamera.fromParameters( camConfig )
         
+        self.imageHeight = camConfig.getResolution()[1]
+     #   self.fullExp = 0.032314464  # pixel
+        self.fullExp = 0.030254520  # tango
+     #   self.fullExp = 0
+        self.lineDelay = self.fullExp / self.imageHeight
+        self.timeshift = None # 0.00282771190097 # 0.0050028984
+
         #extract corners
         self.setupCalibrationTarget( targetConfig, showExtraction=showCorners, showReproj=showReproj, imageStepping=showOneStep )
         multithreading = not (showCorners or showReproj or showOneStep)
@@ -194,8 +201,8 @@ class IrscCamera():
         imu.GyroBiasPrior = (imu.GyroBiasPriorCount-1.0)/imu.GyroBiasPriorCount * imu.GyroBiasPrior + 1.0/imu.GyroBiasPriorCount*b_gyro
 
         #print result
-        print "  Orientation prior camera-imu found as: (R_i_c)"
-        print R_i_c
+        print "  Orientation prior camera-imu found as: (T_i_c)"
+        print self.T_extrinsic.T()
         print "  Gyro bias prior found as: (b_gyro)"
         print b_gyro
     
@@ -214,6 +221,12 @@ class IrscCamera():
     #          in a next step we can use the time shift to estimate the rotation between camera and imu
     def findTimeshiftCameraImuPrior(self, imu, verbose=False):
         print "Estimating time shift camera to imu:"
+        
+        if self.timeshift is not None:
+            print " FIXED Time shift camera to imu (t_imu = t_cam + shift):"
+            self.timeshiftCamToImuPrior = self.timeshift
+            print self.timeshiftCamToImuPrior
+            return self.timeshiftCamToImuPrior
         
         #fit a spline to the camera observations
         poseSpline = self.initPoseSplineFromCamera( timeOffsetPadding=0.0 )
@@ -266,7 +279,10 @@ class IrscCamera():
             sm.logDebug("dT: {0}".format(dT))
         
         #store the timeshift (t_imu = t_cam + timeshiftCamToImuPrior)
-        self.timeshiftCamToImuPrior = shift
+        self.timeshiftCamToImuPrior = shift - self.fullExp / 2
+        if self.timeshiftCamToImuPrior < 0:
+            print "timeshiftCamToImuPrior error {}".format(self.timeshiftCamToImuPrior)
+            self.timeshiftCamToImuPrior = 0.0050028984
         
         print "  Time shift camera to imu (t_imu = t_cam + shift):"
         print self.timeshiftCamToImuPrior
@@ -322,6 +338,7 @@ class IrscCamera():
         # Add the time delay design variable.
         self.cameraTimeToImuTimeDv = aopt.Scalar(0.0)
         self.cameraTimeToImuTimeDv.setActive( not noTimeCalibration )
+        self.cameraTimeToImuTimeDv.setActive(self.timeshift is None)
         problem.addDesignVariable(self.cameraTimeToImuTimeDv, ic.CALIBRATION_GROUP_ID)
         
     def addCameraErrorTerms(self, problem, poseSplineDv, T_cN_b, blakeZissermanDf=0.0, timeOffsetPadding=0.0):
@@ -342,16 +359,17 @@ class IrscCamera():
             
             #as we are applying an initial time shift outside the optimization so 
             #we need to make sure that we dont add data outside the spline definition
-            if frameTimeScalar <= poseSplineDv.spline().t_min() or frameTimeScalar >= poseSplineDv.spline().t_max():
+            if frameTimeScalar <= poseSplineDv.spline().t_min() or frameTimeScalar + self.lineDelay * self.imageHeight >= poseSplineDv.spline().t_max():
                 continue
             
-            T_w_b = poseSplineDv.transformationAtTime(frameTime, timeOffsetPadding, timeOffsetPadding)
-            T_b_w = T_w_b.inverse()
+            if self.lineDelay == 0:
+                T_w_b = poseSplineDv.transformationAtTime(frameTime, timeOffsetPadding, timeOffsetPadding)
+                T_b_w = T_w_b.inverse()
 
-            #calibration target coords to camera N coords
-            #T_b_w: from world to imu coords
-            #T_cN_b: from imu to camera N coords
-            T_c_w = T_cN_b  * T_b_w
+                #calibration target coords to camera N coords
+                #T_b_w: from world to imu coords
+                #T_cN_b: from imu to camera N coords
+                T_c_w = T_cN_b * T_b_w
             
             #get the image and target points corresponding to the frame
             imageCornerPoints =  np.array( obs.getCornersImageFrame() ).T
@@ -376,7 +394,19 @@ class IrscCamera():
             for pidx in range(0,imageCornerPoints.shape[1]):
                 #add all target points
                 targetPoint = np.insert( targetCornerPoints.transpose()[pidx], 3, 1)
-                p = T_c_w *  aopt.HomogeneousExpression( targetPoint )
+
+                if self.lineDelay > 0:
+                    ts = frameTime + imageCornerPoints[1,pidx] * self.lineDelay
+                    T_w_b = poseSplineDv.transformationAtTime(ts, timeOffsetPadding, timeOffsetPadding)
+                   # T_w_b = poseSplineDv.transformationAtTime(frameTime, timeOffsetPadding, timeOffsetPadding)
+                    T_b_w = T_w_b.inverse()
+
+                    #calibration target coords to camera N coords
+                    #T_b_w: from world to imu coords
+                    #T_cN_b: from imu to camera N coords
+                    T_c_w = T_cN_b * T_b_w
+
+                p = T_c_w * aopt.HomogeneousExpression( targetPoint )
              
                 #build and append the error term
                 rerr = error_t(frame, pidx, p)
@@ -655,7 +685,7 @@ class IrscImu(object):
         self.q_i_b_Dv = aopt.RotationQuaternionDv(self.q_i_b_prior)
         problem.addDesignVariable(self.q_i_b_Dv, ic.HELPER_GROUP_ID)
         self.q_i_b_Dv.setActive(False)
-        self.r_b_Dv = aopt.EuclideanPointDv(np.array([0., 0., 0.]))
+        self.r_b_Dv = aopt.EuclideanPointDv(np.array([0., 0., 0.])) # t_b_i
         problem.addDesignVariable(self.r_b_Dv, ic.HELPER_GROUP_ID)
         self.r_b_Dv.setActive(False)
 
@@ -774,7 +804,7 @@ class IrscImu(object):
             return sm.Transformation()
         return sm.Transformation(sm.r2quat(self.q_i_b_Dv.toRotationMatrix()) , \
                                  np.dot(self.q_i_b_Dv.toRotationMatrix(), \
-                                        self.r_b_Dv.toEuclidean()))
+                                        -self.r_b_Dv.toEuclidean()))
 
     def findOrientationPrior(self, referenceImu):
         print
