@@ -11,7 +11,7 @@ import unittest
 def createUniformKnotBSpline(order,segments,dim,knotSpacing=1.0):
     aspl = bsplines.BSpline(order)
     kr = aspl.numKnotsRequired(segments)
-    kc = aspl.numCoefficientsRequired(segments);
+    kc = aspl.numCoefficientsRequired(segments)
     # Choose a uniform knot sequence.
     knots = numpy.linspace(0.0,kr - 1, kr)*knotSpacing
     cp = numpy.random.random([dim,kc])
@@ -20,7 +20,7 @@ def createUniformKnotBSpline(order,segments,dim,knotSpacing=1.0):
 def createExponentialKnotBSpline(order,segments,dim,knotSpacing=1.0):
     aspl = bsplines.BSpline(order)
     kr = aspl.numKnotsRequired(segments)
-    kc = aspl.numCoefficientsRequired(segments);
+    kc = aspl.numCoefficientsRequired(segments)
     # Choose a uniform knot sequence.
     knots = numpy.zeros(kr)
     for i in range(0,kr):
@@ -31,7 +31,7 @@ def createExponentialKnotBSpline(order,segments,dim,knotSpacing=1.0):
 def createRandomKnotBSpline(order,segments,dim):
     aspl = bsplines.BSpline(order)
     kr = aspl.numKnotsRequired(segments)
-    kc = aspl.numCoefficientsRequired(segments);
+    kc = aspl.numCoefficientsRequired(segments)
     # Choose a uniform knot sequence.
     knots = numpy.random.random(kr)*10
     knots.sort()
@@ -41,7 +41,7 @@ def createRandomKnotBSpline(order,segments,dim):
 def createRandomRepeatedKnotBSpline(order,segments,dim):
     aspl = bsplines.BSpline(order)
     kr = aspl.numKnotsRequired(segments)
-    kc = aspl.numCoefficientsRequired(segments);
+    kc = aspl.numCoefficientsRequired(segments)
     # Choose a uniform knot sequence.
     knots = numpy.random.random(kr)*10
     knots.sort()
@@ -69,21 +69,21 @@ class TestBSplines(BSplineTestCase):
     def test_bounds(self):
         numpy.random.seed(3)
         for order in range(2,10):
-            A = createUniformKnotBSpline(order,3,1);
+            A = createUniformKnotBSpline(order,3,1)
             aspl = A[0]
             # Now, test that the bounds checking works.
             # These shouldn't raise an exception.
             aspl.eval(aspl.t_min())
             aspl.eval(aspl.t_max())
             # These boundary cases should.
-            self.assertRaises(RuntimeError, lambda: aspl.eval(aspl.t_min() - 1e-15))
-            self.assertRaises(RuntimeError, lambda: aspl.eval(aspl.t_max() + 1e-15))
-            aspl.eval(aspl.t_max() - 1e-15)
+            self.assertRaises(RuntimeError, lambda: aspl.eval(aspl.t_min() - 1e-10))
+            self.assertRaises(RuntimeError, lambda: aspl.eval(aspl.t_max() + 1e-10))
+            aspl.eval(aspl.t_max() + 1e-15)
     def test_init(self):
         numpy.random.seed(5)
         # Test the initialization from two times and two positions.
-        p_0 = numpy.array([1,2,3]);
-        p_1 = numpy.array([2,4,6]);
+        p_0 = numpy.array([1,2,3])
+        p_1 = numpy.array([2,4,6])
         t_0 = 0.0
         t_1 = 0.1
         dt = t_1 - t_0
@@ -94,7 +94,7 @@ class TestBSplines(BSplineTestCase):
             #print "p_0: %s" % p_0
             #print "p_1: %s" % p_1
             # Initialize the spline with these two times 
-            aspl.initSpline(t_0,t_1,p_0,p_1);
+            aspl.initSpline(t_0,t_1,p_0,p_1)
             b_0 = aspl.eval(t_0)
             b_1 = aspl.eval(t_1)
             v_0 = aspl.evalD(t_0,1)
@@ -130,10 +130,10 @@ class TestBSplines(BSplineTestCase):
             aspl = bsplines.BSpline(order)
             
             kr = aspl.numKnotsRequired(order + 1)
-            kc = aspl.numCoefficientsRequired(order + 1);
+            kc = aspl.numCoefficientsRequired(order + 1)
             # Choose a uniform knot sequence.
             knots = numpy.linspace(0.0,kr - 1, kr)
-            cp = numpy.random.random(kc);
+            cp = numpy.random.random(kc)
             # build a vector-valued spline
             cpa    = numpy.array([cp,cp*cp,cp*cp*cp])
             aspl.setKnotVectorAndCoefficients(knots, cpa)
@@ -145,8 +145,8 @@ class TestBSplines(BSplineTestCase):
             # the current set of knots is uniformly spaced with spacing 1.0
             # Let's muck around with that.
             t_k = ti[1] + 0.5
-            p_k = numpy.array([1.0,2.0,3.0]);
-            aspl.addCurveSegment(t_k,p_k);
+            p_k = numpy.array([1.0,2.0,3.0])
+            aspl.addCurveSegment(t_k,p_k)
             # This function doesn't necessarily preserve the existing curve. It
             # does, however, preserve the curve at ti[0] (all derivatives) and
             # interpolate the value at ti[1]. Verify this.
@@ -177,10 +177,10 @@ class TestBSplines(BSplineTestCase):
             aspl = bsplines.BSpline(order)
             
             kr = aspl.numKnotsRequired(order + 1)
-            kc = aspl.numCoefficientsRequired(order + 1);
+            kc = aspl.numCoefficientsRequired(order + 1)
             # Choose a uniform knot sequence.
             knots = numpy.linspace(0.0,kr - 1, kr)
-            cp = numpy.random.random(kc);
+            cp = numpy.random.random(kc)
             # build a vector-valued spline
             cpa    = numpy.array([cp,cp*cp,cp*cp*cp])
             aspl.setKnotVectorAndCoefficients(knots, cpa)
@@ -215,7 +215,7 @@ class TestBSplines(BSplineTestCase):
             aspl = bsplines.BSpline(order)
 
             kr = aspl.numKnotsRequired(3)
-            kc = aspl.numCoefficientsRequired(3);
+            kc = aspl.numCoefficientsRequired(3)
             # Choose a uniform knot sequence.
             knots = numpy.linspace(0.0,kr*1.0, kr)
 
@@ -237,7 +237,7 @@ class TestBSplines(BSplineTestCase):
             aspl = bsplines.BSpline(order)
 
             kr = aspl.numKnotsRequired(3)
-            kc = aspl.numCoefficientsRequired(3);
+            kc = aspl.numCoefficientsRequired(3)
             # Make a knot sequence that is all zeros at one end and all ones at the other.
             knots = numpy.zeros(kr)
             for i in range(0,knots.size):
@@ -249,7 +249,7 @@ class TestBSplines(BSplineTestCase):
             
             aspl.setKnotVectorAndCoefficients(knots, cpa)
             fspl = (knots,cp,order-1)
-            for i in numpy.linspace(aspl.t_min(),aspl.t_max()-1e-15,10):
+            for i in numpy.linspace(aspl.t_min(),aspl.t_max()-1e-10,10):
                 f = fp.spalde(float(i),fspl)
                 a = aspl.eval(i)
                 for j in range(0,f.shape[0]):
@@ -264,7 +264,7 @@ class TestBSplines(BSplineTestCase):
             aspl = bsplines.BSpline(order)
 
             kr = aspl.numKnotsRequired(3)
-            kc = aspl.numCoefficientsRequired(3);
+            kc = aspl.numCoefficientsRequired(3)
             knots = numpy.random.random([kr]) * 10
             knots.sort()
             cp    = numpy.random.random([kc])
@@ -285,7 +285,7 @@ class TestBSplines(BSplineTestCase):
         for order in range(2,10):
             aspl = bsplines.BSpline(order)
             kr = aspl.numKnotsRequired(3)
-            kc = aspl.numCoefficientsRequired(3);
+            kc = aspl.numCoefficientsRequired(3)
             # Choose a uniform knot sequence.
             knots = numpy.linspace(0.0,kr*1.0, kr)
             cp = numpy.linspace(1.0,kc,kc)
@@ -308,7 +308,7 @@ class TestBSplines(BSplineTestCase):
         for order in range(2,10):
             aspl = bsplines.BSpline(order)
             kr = aspl.numKnotsRequired(3)
-            kc = aspl.numCoefficientsRequired(3);
+            kc = aspl.numCoefficientsRequired(3)
             # Choose a uniform knot sequence.
             knots = numpy.linspace(0.0,kr*1.0, kr)
             cp = numpy.linspace(1.0,kc,kc)
@@ -332,7 +332,7 @@ class TestBSplines(BSplineTestCase):
         for order in range(2,10):
             aspl = bsplines.BSpline(order)
             kr = aspl.numKnotsRequired(3)
-            kc = aspl.numCoefficientsRequired(3);
+            kc = aspl.numCoefficientsRequired(3)
             # Choose a uniform knot sequence.
             knots = numpy.linspace(0.0,kr*1.0, kr)
             cp = numpy.linspace(1.0,kc,kc)
@@ -356,8 +356,8 @@ class TestBSplines(BSplineTestCase):
     def test_init(self):
         numpy.random.seed(5)
         # Test the initialization from two times and two positions.
-        p_0 = numpy.array([1,2,3]);
-        p_1 = numpy.array([2,4,6]);
+        p_0 = numpy.array([1,2,3])
+        p_1 = numpy.array([2,4,6])
         t_0 = 0.0
         t_1 = 0.1
         dt = t_1 - t_0
@@ -368,7 +368,7 @@ class TestBSplines(BSplineTestCase):
             #print "p_0: %s" % p_0
             #print "p_1: %s" % p_1
             # Initialize the spline with these two times 
-            aspl.initSpline(t_0,t_1,p_0,p_1);
+            aspl.initSpline(t_0,t_1,p_0,p_1)
             b_0 = aspl.eval(t_0)
             b_1 = aspl.eval(t_1)
             v_0 = aspl.evalD(t_0,1)
@@ -388,7 +388,7 @@ class TestBSplines(BSplineTestCase):
             nSegments = 3
             aspl = bsplines.BSpline(order)
             kr = aspl.numKnotsRequired(nSegments)
-            kc = aspl.numCoefficientsRequired(nSegments);
+            kc = aspl.numCoefficientsRequired(nSegments)
             # Choose a uniform knot sequence at 0.0, 1.0, ...
             knots = numpy.linspace(0.0,kr-1, kr)
             cp = numpy.linspace(1.0,kc,kc)
@@ -412,10 +412,10 @@ class TestBSplines(BSplineTestCase):
             aspl = bsplines.BSpline(order)
             
             kr = aspl.numKnotsRequired(order + 1)
-            kc = aspl.numCoefficientsRequired(order + 1);
+            kc = aspl.numCoefficientsRequired(order + 1)
             # Choose a uniform knot sequence.
             knots = numpy.linspace(0.0,kr - 1, kr)
-            cp = numpy.random.random(kc);
+            cp = numpy.random.random(kc)
             # build a vector-valued spline
             cpa    = numpy.array([cp,cp*cp,cp*cp*cp])
             aspl.setKnotVectorAndCoefficients(knots, cpa)
@@ -427,8 +427,8 @@ class TestBSplines(BSplineTestCase):
             # the current set of knots is uniformly spaced with spacing 1.0
             # Let's muck around with that.
             t_k = ti[1] + 0.5
-            p_k = numpy.array([1.0,2.0,3.0]);
-            aspl.addCurveSegment(t_k,p_k);
+            p_k = numpy.array([1.0,2.0,3.0])
+            aspl.addCurveSegment(t_k,p_k)
             # This function doesn't necessarily preserve the existing curve. It
             # does, however, preserve the curve at ti[0] (all derivatives) and
             # interpolate the value at ti[1]. Verify this.
@@ -459,10 +459,10 @@ class TestBSplines(BSplineTestCase):
             aspl = bsplines.BSpline(order)
             
             kr = aspl.numKnotsRequired(order + 1)
-            kc = aspl.numCoefficientsRequired(order + 1);
+            kc = aspl.numCoefficientsRequired(order + 1)
             # Choose a uniform knot sequence.
             knots = numpy.linspace(0.0,kr - 1, kr)
-            cp = numpy.random.random(kc);
+            cp = numpy.random.random(kc)
             # build a vector-valued spline
             cpa    = numpy.array([cp,cp*cp,cp*cp*cp])
             aspl.setKnotVectorAndCoefficients(knots, cpa)
@@ -497,14 +497,14 @@ class TestBSplines(BSplineTestCase):
                 # Create a spline with three segments
                 aspl = bsplines.BSpline(order)
                 kr = aspl.numKnotsRequired(4)
-                kc = aspl.numCoefficientsRequired(4);
+                kc = aspl.numCoefficientsRequired(4)
                 # Choose a uniform knot sequence.
                 knots = numpy.linspace(0.0, (kr - 1)*dt, kr)
-                cp = numpy.random.random(kc);
+                cp = numpy.random.random(kc)
                 cpa = numpy.array([cp])
 
-                aspl = bsplines.BSpline(order);
-                aspl.setKnotVectorAndCoefficients(knots,cpa);
+                aspl = bsplines.BSpline(order)
+                aspl.setKnotVectorAndCoefficients(knots,cpa)
                 fspl = (knots,cp,order-1)
                 
                 for a in numpy.arange(aspl.t_min(),aspl.t_max()-1e-15,0.4*dt):
@@ -518,15 +518,15 @@ class TestBSplines(BSplineTestCase):
             # Create a spline with three segments
             aspl = bsplines.BSpline(order)
             kr = aspl.numKnotsRequired(4)
-            kc = aspl.numCoefficientsRequired(4);
+            kc = aspl.numCoefficientsRequired(4)
             # Choose a non-uniform knot sequence.
             knots = numpy.linspace(0.0, (kr - 1), kr)
             knots = knots*knots
-            cp = numpy.random.random(kc);
+            cp = numpy.random.random(kc)
             cpa = numpy.array([cp])
 
-            aspl = bsplines.BSpline(order);
-            aspl.setKnotVectorAndCoefficients(knots,cpa);
+            aspl = bsplines.BSpline(order)
+            aspl.setKnotVectorAndCoefficients(knots,cpa)
             fspl = (knots,cp,order-1)
             
             for a in numpy.arange(aspl.t_min(),aspl.t_max()-1e-15,0.4):
@@ -541,7 +541,7 @@ class TestBSplines(BSplineTestCase):
             # Create a spline with three segments
             aspl = bsplines.BSpline(order)
             kr = aspl.numKnotsRequired(4)
-            kc = aspl.numCoefficientsRequired(4);
+            kc = aspl.numCoefficientsRequired(4)
             # Choose a non-uniform knot sequence.
             knots = numpy.linspace(0.0, (kr - 1), kr)
             knots = knots*knots
@@ -549,11 +549,11 @@ class TestBSplines(BSplineTestCase):
                 if i & 1 > 0:
                     knots[i] = knots[i-1]
             
-            cp = numpy.random.random(kc);
+            cp = numpy.random.random(kc)
             cpa = numpy.array([cp])
 
-            aspl = bsplines.BSpline(order);
-            aspl.setKnotVectorAndCoefficients(knots,cpa);
+            aspl = bsplines.BSpline(order)
+            aspl.setKnotVectorAndCoefficients(knots,cpa)
             fspl = (knots,cp,order-1)
             
             for a in numpy.arange(aspl.t_min(),aspl.t_max()-1e-15,0.4):
@@ -569,11 +569,11 @@ class TestBSplines(BSplineTestCase):
                 # Create a spline with three segments
                 #A = createUniformKnotBSpline(order,4,dim, knotSpacing = 0.5);
                 #A = createExponentialKnotBSpline(order,4,dim, knotSpacing = 1.0);
-                A = createRandomKnotBSpline(order,3,dim);
+                A = createRandomKnotBSpline(order,3,dim)
                 aspl = A[0]
                 for DO in range(0,order):
-                    w = numpy.random.random(dim);
-                    W = numpy.diag(w);
+                    w = numpy.random.random(dim)
+                    W = numpy.diag(w)
                     ef = lambda(t): numpy.dot(numpy.asmatrix(aspl.Phi(t,DO)).T , numpy.dot(W, numpy.asmatrix(aspl.Phi(t,DO))))
                     # for each segment
                     for s in range(0,aspl.numValidTimeSegments()):
@@ -596,10 +596,10 @@ class TestBSplines(BSplineTestCase):
                 # Create a spline with three segments
                 #A = createUniformKnotBSpline(order,4,dim, knotSpacing = 0.5);
                 #A = createExponentialKnotBSpline(order,4,dim, knotSpacing = 1.0);
-                A = createRandomKnotBSpline(order,3,dim);
+                A = createRandomKnotBSpline(order,3,dim)
                 aspl = A[0]
                 for DO in range(0,order):
-                    W = numpy.random.random([dim,dim]);
+                    W = numpy.random.random([dim,dim])
                     W = numpy.dot(W.T,W) + numpy.eye(dim)
                     ef = lambda(t): numpy.dot(numpy.asmatrix(aspl.Phi(t,DO)).T , numpy.dot(W, numpy.asmatrix(aspl.Phi(t,DO))))
                     # for each segment
@@ -626,7 +626,7 @@ class TestBSplines(BSplineTestCase):
                 A = createRandomKnotBSpline(order,3,dim)
                 aspl = A[0]
                 for DO in range(0,order):
-                    W = numpy.random.random([dim,dim]);
+                    W = numpy.random.random([dim,dim])
                     W = numpy.dot(W.T,W) + numpy.eye(dim)
                     class CurveHelper(object):
                         def __init__(self,aspl):
@@ -673,7 +673,7 @@ class TestBSplines(BSplineTestCase):
                     for t in numpy.arange(aspl.t_min(),aspl.t_max(),0.1):
                         self.assertMatricesEqual(aspl.evalD(t,0),c,1e-15,"Error getting back the constant value")
 if __name__ == '__main__':
-    import rostest
-    rostest.rosrun('splines', 'bspline', TestBSplines)
+   import rostest
+   rostest.rosrun('splines', 'bspline', TestBSplines)
     #tb = TestBSplines()
     #tb.test_constant_init()
