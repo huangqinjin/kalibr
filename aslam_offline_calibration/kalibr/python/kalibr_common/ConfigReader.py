@@ -30,7 +30,23 @@ class AslamCamera(object):
                 self.keypointType = cv.Keypoint2
                 self.reprojectionErrorType = cvb.DistortedPinholeReprojectionErrorSimple
                 self.undistorterType = cv.PinholeUndistorterNoMask
-                
+
+            elif dist_model == 'perspective':
+                dist = cv.PerspectiveDistortion(len(dist_coeff))
+                dist.setParameters(np.array(dist_coeff))
+
+                proj = cv.PerspectivePinholeProjection(focalLength[0], focalLength[1], 
+                                                       principalPoint[0], principalPoint[1], 
+                                                       resolution[0], resolution[1], 
+                                                       dist)
+
+                self.geometry = cv.PerspectiveDistortedPinholeCameraGeometry(proj)
+
+                self.frameType = cv.PerspectiveDistortedPinholeFrame
+                self.keypointType = cv.Keypoint2
+                self.reprojectionErrorType = cvb.PerspectiveDistortedPinholeReprojectionErrorSimple
+                self.undistorterType = cv.PerspectivePinholeUndistorterNoMask               
+
             elif dist_model == 'equidistant':
                 dist = cv.EquidistantDistortion(dist_coeff[0], dist_coeff[1], dist_coeff[2], dist_coeff[3])
                 
@@ -251,7 +267,8 @@ class CameraParameters(ParametersBase):
     
     #distortion
     def checkDistortion(self, model, coeffs):
-        distortionModelsAndNumParams = {'radtan': 4,
+        distortionModelsAndNumParams = {'perspective': 8,
+                                        'radtan': 4,
                                         'equidistant': 4, 
                                         'fov': 1, 
                                         'none': 0}

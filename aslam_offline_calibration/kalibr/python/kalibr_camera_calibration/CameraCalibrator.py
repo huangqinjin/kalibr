@@ -653,11 +653,13 @@ def printDebugEnd(cself):
     print
 
 def saveChainParametersYaml(cself, resultFile, graph):
-    cameraModels = {acvb.DistortedPinhole: 'pinhole',
+    cameraModels = {acvb.PerspectivePinhole: 'pinhole',
+                    acvb.DistortedPinhole: 'pinhole',
                     acvb.EquidistantPinhole: 'pinhole',
                     acvb.FovPinhole: 'pinhole',
                     acvb.DistortedOmni: 'omni'}
-    distortionModels = {acvb.DistortedPinhole: 'radtan',
+    distortionModels = {acvb.PerspectivePinhole: 'perspective',
+                        acvb.DistortedPinhole: 'radtan',
                         acvb.EquidistantPinhole: 'equidistant',
                         acvb.FovPinhole: 'fov',
                         acvb.DistortedOmni: 'radtan'}

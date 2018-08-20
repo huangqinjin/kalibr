@@ -12,6 +12,7 @@
 // Distortion models
 #include <aslam/cameras/NoDistortion.hpp>
 #include <aslam/cameras/RadialTangentialDistortion.hpp>
+#include <aslam/cameras/PerspectiveDistortion.hpp>
 #include <aslam/cameras/EquidistantDistortion.hpp>
 #include <aslam/cameras/FovDistortion.hpp>
 
@@ -29,6 +30,8 @@ namespace cameras {
 typedef CameraGeometry<PinholeProjection<NoDistortion>, GlobalShutter, NoMask> PinholeCameraGeometry;
 typedef CameraGeometry<PinholeProjection<RadialTangentialDistortion>,
     GlobalShutter, NoMask> DistortedPinholeCameraGeometry;
+typedef CameraGeometry<PinholeProjection<PerspectiveDistortion>, GlobalShutter,
+    NoMask> PerspectiveDistortedPinholeCameraGeometry;
 typedef CameraGeometry<PinholeProjection<EquidistantDistortion>, GlobalShutter,
     NoMask> EquidistantDistortedPinholeCameraGeometry;
 typedef CameraGeometry<PinholeProjection<FovDistortion>, GlobalShutter,
@@ -45,6 +48,8 @@ typedef CameraGeometry<OmniProjection<FovDistortion>, GlobalShutter,
 typedef CameraGeometry<PinholeProjection<NoDistortion>, RollingShutter, NoMask> PinholeRsCameraGeometry;
 typedef CameraGeometry<PinholeProjection<RadialTangentialDistortion>,
     RollingShutter, NoMask> DistortedPinholeRsCameraGeometry;
+typedef CameraGeometry<PinholeProjection<PerspectiveDistortion>, RollingShutter,
+    NoMask> PerspectiveDistortedPinholeRsCameraGeometry;
 typedef CameraGeometry<PinholeProjection<EquidistantDistortion>, RollingShutter,
     NoMask> EquidistantDistortedPinholeRsCameraGeometry;
 typedef CameraGeometry<PinholeProjection<FovDistortion>, RollingShutter,
@@ -61,6 +66,8 @@ typedef CameraGeometry<OmniProjection<FovDistortion>, RollingShutter,
 typedef CameraGeometry<PinholeProjection<NoDistortion>, GlobalShutter, ImageMask> MaskedPinholeCameraGeometry;
 typedef CameraGeometry<PinholeProjection<RadialTangentialDistortion>,
     GlobalShutter, ImageMask> MaskedDistortedPinholeCameraGeometry;
+typedef CameraGeometry<PinholeProjection<PerspectiveDistortion>, GlobalShutter,
+    ImageMask> MaskedPerspectiveDistortedPinholeCameraGeometry;
 typedef CameraGeometry<PinholeProjection<EquidistantDistortion>, GlobalShutter,
     ImageMask> MaskedEquidistantDistortedPinholeCameraGeometry;
 typedef CameraGeometry<PinholeProjection<FovDistortion>, GlobalShutter,
@@ -78,6 +85,8 @@ typedef CameraGeometry<PinholeProjection<NoDistortion>, RollingShutter,
     ImageMask> MaskedPinholeRsCameraGeometry;
 typedef CameraGeometry<PinholeProjection<RadialTangentialDistortion>,
     RollingShutter, ImageMask> MaskedDistortedPinholeRsCameraGeometry;
+typedef CameraGeometry<PinholeProjection<PerspectiveDistortion>, RollingShutter,
+    ImageMask> MaskedPerspectiveDistortedPinholeRsCameraGeometry;
 typedef CameraGeometry<PinholeProjection<EquidistantDistortion>, RollingShutter,
     ImageMask> MaskedEquidistantDistortedPinholeRsCameraGeometry;
 typedef CameraGeometry<PinholeProjection<FovDistortion>, RollingShutter,
@@ -94,6 +103,8 @@ typedef CameraGeometry<OmniProjection<FovDistortion>, RollingShutter,
 typedef CameraGeometry<DepthProjection<NoDistortion>, GlobalShutter, NoMask> DepthCameraGeometry;
 typedef CameraGeometry<DepthProjection<RadialTangentialDistortion>,
     GlobalShutter, NoMask> DistortedDepthCameraGeometry;
+typedef CameraGeometry<DepthProjection<PerspectiveDistortion>, GlobalShutter,
+    NoMask> PerspectiveDistortedDepthCameraGeometry;
 typedef CameraGeometry<DepthProjection<EquidistantDistortion>, GlobalShutter,
     NoMask> EquidistantDistortedDepthCameraGeometry;
 typedef CameraGeometry<DepthProjection<FovDistortion>, GlobalShutter,

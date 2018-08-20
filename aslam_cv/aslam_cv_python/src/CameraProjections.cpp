@@ -5,6 +5,7 @@
 #include <aslam/cameras/EquidistantDistortion.hpp>
 #include <aslam/cameras/FovDistortion.hpp>
 #include <aslam/cameras/RadialTangentialDistortion.hpp>
+#include <aslam/cameras/PerspectiveDistortion.hpp>
 #include <boost/serialization/nvp.hpp>
 #include <sm/python/boost_serialization_pickle.hpp>
 #include <sm/python/unique_register_ptr_to_python.hpp>
@@ -245,6 +246,20 @@ void exportRadialTangentialDistortionFunctions() {
   //exportGenericProjectionDesignVariable<RadialTangentialDistortion>("RadialTangentialDistortion");
 }
 
+
+void exportPerspectiveDistortionFunctions() {
+
+  class_<PerspectiveDistortion,
+      boost::shared_ptr<PerspectiveDistortion> > distortion(
+      "PerspectiveDistortion", init<>());
+  distortion.def(init<int>("PerspectiveDistortion(int distortion_parameters_count)"));
+  sm::python::unique_register_ptr_to_python<boost::shared_ptr<PerspectiveDistortion> >();
+
+  exportGenericDistortionFunctions<PerspectiveDistortion>(distortion);
+
+  // \todo export
+}
+
 template<typename D>
 void exportOmniProjection(std::string name) {
 
@@ -354,11 +369,14 @@ void exportCameraProjections() {
   //exportGenericProjectionDesignVariable<NoDistortion>("NoDistortion");
 
   exportRadialTangentialDistortionFunctions();
+  exportPerspectiveDistortionFunctions();
   exportFovDistortionFunctions();
 
   exportPinholeProjection<NoDistortion>("PinholeProjection");
   exportPinholeProjection<RadialTangentialDistortion>(
       "DistortedPinholeProjection");
+  exportPinholeProjection<PerspectiveDistortion>(
+      "PerspectivePinholeProjection");
   exportPinholeProjection<EquidistantDistortion>(
       "EquidistantPinholeProjection");
   exportPinholeProjection<FovDistortion>(

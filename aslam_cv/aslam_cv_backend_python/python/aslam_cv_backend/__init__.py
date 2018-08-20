@@ -56,6 +56,27 @@ class DistortedPinholeRs(CameraModel):
     shutterType = aslam_cv.RollingShutter
     frameType = aslam_cv.DistortedPinholeRsFrame
 
+class PerspectivePinhole(CameraModel):
+    geometry = aslam_cv.PerspectiveDistortedPinholeCameraGeometry
+    reprojectionError = PerspectiveDistortedPinholeReprojectionError
+    reprojectionErrorSimple = PerspectiveDistortedPinholeReprojectionErrorSimple
+    designVariable = PerspectiveDistortedPinholeCameraGeometryDesignVariable
+    projectionType = aslam_cv.PerspectivePinholeProjection
+    distortionType = aslam_cv.PerspectiveDistortion
+    shutterType = aslam_cv.GlobalShutter
+    frameType = aslam_cv.PerspectiveDistortedPinholeFrame
+
+class PerspectivePinholeRs(CameraModel):
+    geometry = aslam_cv.PerspectiveDistortedPinholeRsCameraGeometry
+    reprojectionError = PerspectiveDistortedPinholeRsReprojectionError
+    reprojectionErrorSimple = PerspectiveDistortedPinholeRsReprojectionErrorSimple
+    reprojectionErrorAdaptiveCovariance = PerspectiveDistortedPinholeRsReprojectionErrorAdaptiveCovariance
+    designVariable = PerspectiveDistortedPinholeRsCameraGeometryDesignVariable
+    projectionType = aslam_cv.PerspectivePinholeProjection
+    distortionType = aslam_cv.PerspectiveDistortion
+    shutterType = aslam_cv.RollingShutter
+    frameType = aslam_cv.PerspectivePinholeRsFrame   
+
 class EquidistantPinhole(CameraModel):
     geometry = aslam_cv.EquidistantDistortedPinholeCameraGeometry
     reprojectionError = EquidistantDistortedPinholeReprojectionError
@@ -75,7 +96,7 @@ class EquidistantPinholeRs(CameraModel):
     projectionType = aslam_cv.EquidistantPinholeProjection
     distortionType = aslam_cv.EquidistantDistortion
     shutterType = aslam_cv.RollingShutter
-    frameType = aslam_cv.EquidistantPinholeRsFrame
+    frameType = aslam_cv.EquidistantPinholeRsFrame 
 
 class FovPinhole(CameraModel):
     geometry = aslam_cv.FovDistortedPinholeCameraGeometry

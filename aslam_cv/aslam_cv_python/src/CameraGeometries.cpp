@@ -93,6 +93,8 @@ void exportCameraGeometries() {
   exportCameraGeometry<PinholeCameraGeometry>("PinholeCameraGeometry");
   exportCameraGeometry<DistortedPinholeCameraGeometry>(
       "DistortedPinholeCameraGeometry");
+  exportCameraGeometry<PerspectiveDistortedPinholeCameraGeometry>(
+      "PerspectiveDistortedPinholeCameraGeometry");
   exportCameraGeometry<EquidistantDistortedPinholeCameraGeometry>(
       "EquidistantDistortedPinholeCameraGeometry");
   exportCameraGeometry<FovDistortedPinholeCameraGeometry>(
@@ -101,6 +103,8 @@ void exportCameraGeometries() {
   exportCameraGeometry<PinholeRsCameraGeometry>("PinholeRsCameraGeometry");
   exportCameraGeometry<DistortedPinholeRsCameraGeometry>(
       "DistortedPinholeRsCameraGeometry");
+  exportCameraGeometry<PerspectiveDistortedPinholeRsCameraGeometry>(
+      "PerspectiveDistortedPinholeRsCameraGeometry");
   exportCameraGeometry<EquidistantDistortedPinholeRsCameraGeometry>(
       "EquidistantDistortedPinholeRsCameraGeometry");
   exportCameraGeometry<FovDistortedPinholeRsCameraGeometry>(
@@ -128,6 +132,8 @@ void exportCameraGeometries() {
       "MaskedDistortedPinholeCameraGeometry");
   exportCameraGeometry<MaskedEquidistantDistortedPinholeCameraGeometry>(
       "MaskedEquidistantDistortedPinholeCameraGeometry");
+  exportCameraGeometry<MaskedPerspectiveDistortedPinholeCameraGeometry>(
+      "MaskedPerspectiveDistortedPinholeCameraGeometry");
   exportCameraGeometry<MaskedFovDistortedPinholeCameraGeometry>(
       "MaskedFovDistortedPinholeCameraGeometry");
 
@@ -137,6 +143,8 @@ void exportCameraGeometries() {
       "MaskedDistortedPinholeRsCameraGeometry");
   exportCameraGeometry<MaskedEquidistantDistortedPinholeRsCameraGeometry>(
       "MaskedEquidistantDistortedPinholeRsCameraGeometry");
+  exportCameraGeometry<MaskedPerspectiveDistortedPinholeRsCameraGeometry>(
+      "MaskedPerspectiveDistortedPinholeRsCameraGeometry");
   exportCameraGeometry<MaskedFovDistortedPinholeRsCameraGeometry>(
       "MaskedFovDistortedPinholeRsCameraGeometry");
 

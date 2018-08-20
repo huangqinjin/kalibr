@@ -7,6 +7,7 @@
 #include <aslam/cameras/OmniProjection.hpp>
 #include <aslam/cameras/NoDistortion.hpp>
 #include <aslam/cameras/RadialTangentialDistortion.hpp>
+#include <aslam/cameras/PerspectiveDistortion.hpp>
 #include <aslam/cameras/EquidistantDistortion.hpp>
 #include <aslam/cameras.hpp>
 #include <aslam/cameras/GlobalShutter.hpp>
@@ -30,6 +31,10 @@ BOOST_PYTHON_MODULE(libaslam_cv_backend_python)
   aslam::python::exportReprojectionErrors<DistortedPinholeCameraGeometry>("DistortedPinhole");
   aslam::python::exportReprojectionErrors<DistortedPinholeRsCameraGeometry>("DistortedPinholeRs");
   aslam::python::exportCovarianceReprojectionError<DistortedPinholeRsCameraGeometry>("DistortedPinholeRs");
+
+  aslam::python::exportReprojectionErrors<PerspectiveDistortedPinholeCameraGeometry>("PerspectiveDistortedPinhole");
+  aslam::python::exportReprojectionErrors<PerspectiveDistortedPinholeRsCameraGeometry>("PerspectiveDistortedPinholeRs");
+  aslam::python::exportCovarianceReprojectionError<PerspectiveDistortedPinholeRsCameraGeometry>("PerspectiveDistortedPinholeRs");
 
   aslam::python::exportReprojectionErrors<EquidistantDistortedPinholeCameraGeometry>("EquidistantDistortedPinhole");
   aslam::python::exportReprojectionErrors<EquidistantDistortedPinholeRsCameraGeometry>("EquidistantDistortedPinholeRs");
@@ -61,11 +66,13 @@ BOOST_PYTHON_MODULE(libaslam_cv_backend_python)
 
   exportCameraDesignVariables<PinholeCameraGeometry>("PinholeCameraGeometry");
   exportCameraDesignVariables<DistortedPinholeCameraGeometry>("DistortedPinholeCameraGeometry");
+  exportCameraDesignVariables<PerspectiveDistortedPinholeCameraGeometry>("PerspectiveDistortedPinholeCameraGeometry");
   exportCameraDesignVariables<EquidistantDistortedPinholeCameraGeometry>("EquidistantDistortedPinholeCameraGeometry");
   exportCameraDesignVariables<FovDistortedPinholeCameraGeometry>("FovDistortedPinholeCameraGeometry");
 
   exportCameraDesignVariables<PinholeRsCameraGeometry>("PinholeRsCameraGeometry");
   exportCameraDesignVariables<DistortedPinholeRsCameraGeometry>("DistortedPinholeRsCameraGeometry");
+  exportCameraDesignVariables<PerspectiveDistortedPinholeRsCameraGeometry>("PerspectiveDistortedPinholeRsCameraGeometry");
   exportCameraDesignVariables<EquidistantDistortedPinholeRsCameraGeometry>("EquidistantDistortedPinholeRsCameraGeometry");
   exportCameraDesignVariables<FovDistortedPinholeRsCameraGeometry>("FovDistortedPinholeRsCameraGeometry");
 
@@ -81,11 +88,13 @@ BOOST_PYTHON_MODULE(libaslam_cv_backend_python)
 
   exportCameraDesignVariables<MaskedPinholeCameraGeometry>("MaskedPinholeCameraGeometry");
   exportCameraDesignVariables<MaskedDistortedPinholeCameraGeometry>("MaskedDistortedPinholeCameraGeometry");
+  exportCameraDesignVariables<MaskedPerspectiveDistortedPinholeCameraGeometry>("MaskedPerspectiveDistortedPinholeCameraGeometry");
   exportCameraDesignVariables<MaskedEquidistantDistortedPinholeCameraGeometry>("MaskedEquidistantDistortedPinholeCameraGeometry");
   exportCameraDesignVariables<MaskedFovDistortedPinholeCameraGeometry>("MaskedFovDistortedPinholeCameraGeometry");
 
   exportCameraDesignVariables<MaskedPinholeRsCameraGeometry>("MaskedPinholeRsCameraGeometry");
   exportCameraDesignVariables<MaskedDistortedPinholeRsCameraGeometry>("MaskedDistortedPinholeRsCameraGeometry");
+  exportCameraDesignVariables<MaskedPerspectiveDistortedPinholeRsCameraGeometry>("MaskedPerspectiveDistortedPinholeRsCameraGeometry");
   exportCameraDesignVariables<MaskedEquidistantDistortedPinholeRsCameraGeometry>("MaskedEquidistantDistortedPinholeRsCameraGeometry");
   exportCameraDesignVariables<MaskedFovDistortedPinholeRsCameraGeometry>("MaskedFovDistortedPinholeRsCameraGeometry");
 
@@ -101,17 +110,20 @@ BOOST_PYTHON_MODULE(libaslam_cv_backend_python)
 
   exportCameraDesignVariables<DepthCameraGeometry>("DepthCameraGeometry");
   exportCameraDesignVariables<DistortedDepthCameraGeometry>("DistortedDepthCameraGeometry");
+  exportCameraDesignVariables<PerspectiveDistortedDepthCameraGeometry>("PerspectiveDistortedDepthCameraGeometry");
   exportCameraDesignVariables<EquidistantDistortedDepthCameraGeometry>("EquidistantDistortedDepthCameraGeometry");
   exportCameraDesignVariables<FovDistortedDepthCameraGeometry>("FovDistortedDepthCameraGeometry");
 
   // Export Projection and Distortion Model Design Variables:
   exportGenericProjectionDesignVariable<NoDistortion>("NoDistortion");
   exportGenericProjectionDesignVariable<RadialTangentialDistortion>("RadialTangentialDistortion");
+  exportGenericProjectionDesignVariable<PerspectiveDistortion>("PerspectiveDistortion");
   exportGenericProjectionDesignVariable<EquidistantDistortion>("EquidistantDistortion");
   exportGenericProjectionDesignVariable<FovDistortion>("FovDistortion");
 
   exportGenericProjectionDesignVariable< PinholeProjection<NoDistortion> >("PinholeProjection");
   exportGenericProjectionDesignVariable< PinholeProjection<RadialTangentialDistortion> >("DistortedPinholeProjection");
+  exportGenericProjectionDesignVariable< PinholeProjection<PerspectiveDistortion> >("PerspectiveDistortedPinholeProjection");
   exportGenericProjectionDesignVariable< PinholeProjection<EquidistantDistortion> >("EquidistantDistortedPinholeProjection");
   exportGenericProjectionDesignVariable< PinholeProjection<FovDistortion> >("FovDistortedPinholeProjection");
 

@@ -7,6 +7,7 @@ using namespace aslam;
 
 void exportPinholeUndistorter() {
   aslam::cameras::exportPinholeUndistorter<cameras::RadialTangentialDistortion, aslam::cameras::NoMask>("PinholeUndistorterNoMask");
+  aslam::cameras::exportPinholeUndistorter<cameras::PerspectiveDistortion, aslam::cameras::NoMask>("PerspectivePinholeUndistorterNoMask");
   aslam::cameras::exportPinholeUndistorter<cameras::EquidistantDistortion, aslam::cameras::NoMask>("EquidistantPinholeUndistorterNoMask");
   aslam::cameras::exportPinholeUndistorter<cameras::FovDistortion, aslam::cameras::NoMask>("FovPinholeUndistorterNoMask");
 }

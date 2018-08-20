@@ -208,13 +208,13 @@ void PerspectiveDistortion::distortParameterJacobian(
 
 template<class Archive>
 void PerspectiveDistortion::save(Archive & ar,
-                                      const unsigned int /* version */) const {
+                                 const unsigned int /* version */) const {
   ar << BOOST_SERIALIZATION_NVP(distortion);
 }
 
 template<class Archive>
 void PerspectiveDistortion::load(Archive & ar,
-                                      const unsigned int version) {
+                                 const unsigned int version) {
   SM_ASSERT_LE(std::runtime_error, version,
                (unsigned int) CLASS_SERIALIZATION_VERSION,
                "Unsupported serialization version");
