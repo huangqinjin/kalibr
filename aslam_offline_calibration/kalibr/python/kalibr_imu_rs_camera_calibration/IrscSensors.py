@@ -58,8 +58,8 @@ class IrscCamera():
         self.camera = kc.AslamCamera.fromParameters( camConfig )
         
         self.imageHeight = camConfig.getResolution()[1]
-     #   self.fullExp = 0.032314464  # pixel
-        self.fullExp = 0.030254520  # tango
+        self.fullExp = 0.032314464  # pixel
+     #   self.fullExp = 0.030254520  # tango
      #   self.fullExp = 0
         self.lineDelay = self.fullExp / self.imageHeight
         self.timeshift = None # 0.00282771190097 # 0.0050028984
@@ -127,6 +127,9 @@ class IrscCamera():
         # build the problem
         problem = aopt.OptimizationProblem()
 
+        # Note(huang): self.T_extrinsic (T_c_b) should be identity when this routine called.
+        # q_i_c_Dv is initialized to identity and pose spline is T_w_c.
+
         # Add the rotation as design variable
         q_i_c_Dv = aopt.RotationQuaternionDv(  self.T_extrinsic.q() )
         q_i_c_Dv.setActive( True )
@@ -182,15 +185,15 @@ class IrscCamera():
             sys.exit(-1)
 
         #overwrite the external rotation prior (keep the external translation prior)
-        R_i_c = q_i_c_Dv.toRotationMatrix().transpose()
-        self.T_extrinsic = sm.Transformation( sm.rt2Transform( R_i_c, self.T_extrinsic.t() ) )
+        R_c_i = q_i_c_Dv.toRotationMatrix().transpose()
+        self.T_extrinsic = sm.Transformation( sm.rt2Transform( R_c_i, self.T_extrinsic.t() ) )
 
         #estimate gravity in the world coordinate frame as the mean specific force
         a_w = []
         for im in imu.imuData:
             tk = im.stamp.toSec()
             if tk > poseSpline.t_min() and tk < poseSpline.t_max():
-                a_w.append(np.dot(poseSpline.orientation(tk), np.dot(R_i_c, - im.alpha)))
+                a_w.append(np.dot(poseSpline.orientation(tk), np.dot(R_c_i, - im.alpha)))
         mean_a_w = np.mean(np.asarray(a_w).T, axis=1)
         self.gravity_w = mean_a_w / np.linalg.norm(mean_a_w) * 9.80655
         print "Gravity was intialized to", self.gravity_w, "[m/s^2]" 
@@ -201,7 +204,7 @@ class IrscCamera():
         imu.GyroBiasPrior = (imu.GyroBiasPriorCount-1.0)/imu.GyroBiasPriorCount * imu.GyroBiasPrior + 1.0/imu.GyroBiasPriorCount*b_gyro
 
         #print result
-        print "  Orientation prior camera-imu found as: (T_i_c)"
+        print "  Orientation prior camera-imu found as: (T_c_i)"
         print self.T_extrinsic.T()
         print "  Gyro bias prior found as: (b_gyro)"
         print b_gyro
