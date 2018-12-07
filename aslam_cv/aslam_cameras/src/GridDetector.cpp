@@ -2,9 +2,9 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
 #include <Eigen/Core>
-#include <opencv2/core/core.hpp>
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/core.hpp>
+#include <opencv2/highgui.hpp>
+#include <opencv2/imgproc.hpp>
 #include <sm/logging.hpp>
 #include <aslam/cameras/GridDetector.hpp>
 
@@ -33,7 +33,7 @@ void GridDetector::initializeDetector()
 {
   if (_options.plotCornerReprojection) {
     cv::namedWindow("Corner reprojection");
-    cvStartWindowThread();
+    cv::startWindowThread();
   }
 }
 
@@ -186,7 +186,7 @@ bool GridDetector::findTarget(const cv::Mat & image, const aslam::Time & stamp,
   // show plot of reprojected corners
   if (_options.plotCornerReprojection) {
     cv::Mat imageCopy1 = image.clone();
-    cv::cvtColor(imageCopy1, imageCopy1, CV_GRAY2RGB);
+    cv::cvtColor(imageCopy1, imageCopy1, cv::COLOR_GRAY2RGB);
 
     if (success) {
       //calculate reprojection
@@ -199,7 +199,7 @@ bool GridDetector::findTarget(const cv::Mat & image, const aslam::Time & stamp,
 
     } else {
       cv::putText(imageCopy1, "Detection failed! (frame not used)",
-                  cv::Point(50, 50), CV_FONT_HERSHEY_SIMPLEX, 0.8,
+                  cv::Point(50, 50), cv::FONT_HERSHEY_SIMPLEX, 0.8,
                   CV_RGB(255,0,0), 3, 8, false);
     }
 
