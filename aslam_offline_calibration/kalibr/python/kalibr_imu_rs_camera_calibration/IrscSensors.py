@@ -49,8 +49,11 @@ class IrscCamera():
         self.cornerUncertainty = reprojectionSigma
 
         #set the extrinsic prior to default
+        # T_extrinsic is T_c_b for cam0 and T_cN_c{N-1} for camN
         self.T_extrinsic = sm.Transformation()
-         
+
+        self.T_c_b = None # sm.Transformation(np.matrix([[], [], [], [0, 0, 0, 1]]))
+
         #initialize timeshift prior to zero
         self.timeshiftCamToImuPrior = 0.0
         
@@ -60,6 +63,7 @@ class IrscCamera():
         self.imageHeight = camConfig.getResolution()[1]
         self.fullExp = 0.032314464  # pixel
      #   self.fullExp = 0.030254520  # tango
+     #   self.fullExp = 0.033323304  # SC
      #   self.fullExp = 0
         self.lineDelay = self.fullExp / self.imageHeight
         self.timeshift = None # 0.00282771190097 # 0.0050028984
@@ -127,12 +131,14 @@ class IrscCamera():
         # build the problem
         problem = aopt.OptimizationProblem()
 
-        # Note(huang): self.T_extrinsic (T_c_b) should be identity when this routine called.
-        # q_i_c_Dv is initialized to identity and pose spline is T_w_c.
+        if self.T_c_b is None:
+            T_c_i = self.T_extrinsic
+        else:
+            T_c_i = self.T_c_b
 
         # Add the rotation as design variable
-        q_i_c_Dv = aopt.RotationQuaternionDv(  self.T_extrinsic.q() )
-        q_i_c_Dv.setActive( True )
+        q_i_c_Dv = aopt.RotationQuaternionDv( T_c_i.inverse().q() )
+        q_i_c_Dv.setActive( self.T_c_b is None )
         problem.addDesignVariable(q_i_c_Dv)
 
         # Add the gyro bias as design variable
@@ -140,6 +146,8 @@ class IrscCamera():
         gyroBiasDv.setActive( True )
         problem.addDesignVariable(gyroBiasDv)
         
+        # Note: self.T_extrinsic should be identity such that poseSpline is T_w_c.
+        self.T_extrinsic = sm.Transformation()
         #initialize a pose spline using the camera poses
         poseSpline = self.initPoseSplineFromCamera( timeOffsetPadding=0.0 )
         
@@ -186,7 +194,7 @@ class IrscCamera():
 
         #overwrite the external rotation prior (keep the external translation prior)
         R_c_i = q_i_c_Dv.toRotationMatrix().transpose()
-        self.T_extrinsic = sm.Transformation( sm.rt2Transform( R_c_i, self.T_extrinsic.t() ) )
+        self.T_extrinsic = sm.Transformation( sm.rt2Transform( R_c_i, T_c_i.t() ) )
 
         #estimate gravity in the world coordinate frame as the mean specific force
         a_w = []
@@ -199,7 +207,7 @@ class IrscCamera():
         print "Gravity was intialized to", self.gravity_w, "[m/s^2]" 
 
         #set the gyro bias prior (if we have more than 1 cameras use recursive average)
-        b_gyro = bias.toEuclidean() 
+        b_gyro = gyroBiasDv.toExpression().toEuclidean() 
         imu.GyroBiasPriorCount += 1
         imu.GyroBiasPrior = (imu.GyroBiasPriorCount-1.0)/imu.GyroBiasPriorCount * imu.GyroBiasPrior + 1.0/imu.GyroBiasPriorCount*b_gyro
 
@@ -283,9 +291,6 @@ class IrscCamera():
         
         #store the timeshift (t_imu = t_cam + timeshiftCamToImuPrior)
         self.timeshiftCamToImuPrior = shift - self.fullExp / 2
-        if self.timeshiftCamToImuPrior < 0:
-            print "timeshiftCamToImuPrior error {}".format(self.timeshiftCamToImuPrior)
-            self.timeshiftCamToImuPrior = 0.0050028984
         
         print "  Time shift camera to imu (t_imu = t_cam + shift):"
         print self.timeshiftCamToImuPrior
@@ -551,7 +556,7 @@ class IrscCameraChain():
         for camNr, cam in enumerate( self.camList ):
             #the first "baseline" dv is between the imu and cam0
             if camNr == 0:
-                noExtrinsics = False
+                noExtrinsics = cam.T_c_b is not None
                 baselinedv_group_id = ic.CALIBRATION_GROUP_ID
             else:
                 noExtrinsics = noChainExtrinsics
