@@ -215,7 +215,14 @@ class RsCalibrator(object):
             sensorRows = self.__observations[0].imRows()
             self.__camera.shutter().setParameters(np.array([1.0 / self.__config.framerate / float(sensorRows)]))
 
-        return self.__camera.initializeIntrinsics(self.__observations)
+        r = self.__camera.initializeIntrinsics(self.__observations)
+        if False:
+            self.__camera.projection().setParameters(np.array([1, 1, 1, 1]))
+            self.__camera.projection().distortion().setParameters(np.array([0, 0, 0, 0]))
+            self.__config.estimateParameters['intrinsics'] = False
+            self.__config.estimateParameters['distortion'] = False
+            return True
+        return r
 
     def __getMotionModelPriorOrDefault(self):
         """Get the motion model prior or the default value"""

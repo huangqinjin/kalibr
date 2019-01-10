@@ -33,10 +33,12 @@ def __initBagDataset(bagfile, topic, from_to):
 #available models
 cameraModels = {
     # rolling shutter
+    'pinhole-perspective-rs': acvb.PerspectivePinholeRs,
     'pinhole-radtan-rs': acvb.DistortedPinholeRs,
     'pinhole-equi-rs':   acvb.EquidistantPinholeRs,
     'omni-radtan-rs':    acvb.DistortedOmniRs,
     # global shutter
+    'pinhole-perspective': acvb.PerspectivePinhole,
     'pinhole-radtan':    acvb.DistortedPinhole,
     'pinhole-equi':      acvb.EquidistantPinhole,
     'omni-radtan':       acvb.DistortedOmni
