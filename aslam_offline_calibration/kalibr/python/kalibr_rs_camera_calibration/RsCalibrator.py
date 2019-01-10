@@ -50,8 +50,8 @@ class RsCalibratorConfiguration(object):
     inverseFeatureCovariance = 1/0.26
     """The inverse covariance of the feature detector. Used to standardize the error terms."""
 
-    estimateParameters = {'shutter': True, 'intrinsics': True, 'distortion': True, 'pose': True, 'landmarks': False}
-    """Which parameters to estimate. Dictionary with shutter, intrinsics, distortion, pose, landmarks as bool"""
+    estimateParameters = {'shutter': True, 'intrinsics': True, 'distortion': True, 'pose': True}
+    """Which parameters to estimate. Dictionary with shutter, intrinsics, distortion, pose as bool"""
 
     splineOrder = 4
     """Order of the spline to use for ct-parametrization"""
@@ -272,21 +272,6 @@ class RsCalibrator(object):
         self.__frames = []
         self.__reprojection_errors = []
 
-        # This code assumes that the order of the landmarks in the observations
-        # is invariant across all observations. At least for the chessboards it is true.
-
-        #####
-        # add all the landmarks once
-        landmarks = []
-        landmarks_expr = []
-        for landmark in self.__observations[0].getCornersTargetFrame():
-            # design variable for landmark
-            landmark_w_dv = aopt.HomogeneousPointDv(sm.toHomogeneous(landmark))
-            landmark_w_dv.setActive(self.__config.estimateParameters['landmarks'])
-            landmarks.append(landmark_w_dv)
-            landmarks_expr.append(landmark_w_dv.toExpression())
-            problem.addDesignVariable(landmark_w_dv, CALIBRATION_GROUP_ID)
-
         #####
         # activate design variables
         self.__camera_dv.setActive(
@@ -321,9 +306,9 @@ class RsCalibrator(object):
 
                 #####
                 # add an error term for every observed corner
-                for index, point in enumerate(observation.getCornersImageFrame()):
+                for imagePoint, targetPoint in zip(observation.getCornersImageFrame(), observation.getCornersTargetFrame()):
                     # keypoint time offset by line delay as expression type
-                    keypoint_time = self.__camera_dv.keypointTime(frame.time(), point)
+                    keypoint_time = self.__camera_dv.keypointTime(frame.time(), imagePoint)
 
                     # from camera to target transformation.
                     T_t_c = self.__poseSpline_dv.transformationAtTime(
@@ -334,14 +319,13 @@ class RsCalibrator(object):
                     T_c_t = T_t_c.inverse()
 
                     # transform target point to camera frame
-                    p_c = T_c_t * landmarks_expr[index]
+                    p_c = T_c_t * aopt.HomogeneousExpression(sm.toHomogeneous(targetPoint))
 
                     # create the keypoint
                     keypoint = acv.Keypoint2()
-                    keypoint.setMeasurement(point)
+                    keypoint.setMeasurement(imagePoint)
                     inverseFeatureCovariance = self.__config.inverseFeatureCovariance
-                    keypoint.setInverseMeasurementCovariance(np.eye(len(point)) * inverseFeatureCovariance)
-                    keypoint.setLandmarkId(index)
+                    keypoint.setInverseMeasurementCovariance(np.eye(len(imagePoint)) * inverseFeatureCovariance)
                     frame.addKeypoint(keypoint)
                     keypoint_index = frame.numKeypoints() - 1
 
