@@ -111,6 +111,9 @@ class RsCalibrator(object):
     __reprojection_errors = []
     """Reprojection errors of the latest optimizer iteration"""
 
+    frameTimeToFirstLineTime = 0.0
+    frameTimeToFirstLineTimeDv = None # aopt.Scalar(frameTimeToFirstLineTime)
+
     def calibrate(self,
         cameraGeometry,
         observations,
@@ -287,6 +290,10 @@ class RsCalibrator(object):
             self.__config.estimateParameters['shutter']
         )
 
+        if self.frameTimeToFirstLineTimeDv is not None:
+            self.frameTimeToFirstLineTimeDv.setActive(True)
+            problem.addDesignVariable(self.frameTimeToFirstLineTimeDv, CALIBRATION_GROUP_ID)
+
         #####
         # Add design variables
 
@@ -315,7 +322,10 @@ class RsCalibrator(object):
                 # add an error term for every observed corner
                 for imagePoint, targetPoint in zip(observation.getCornersImageFrame(), observation.getCornersTargetFrame()):
                     # keypoint time offset by line delay as expression type
-                    keypoint_time = self.__camera_dv.keypointTime(frame.time(), imagePoint)
+                    if self.frameTimeToFirstLineTimeDv is not None:
+                        keypoint_time = self.__camera_dv.keypointTime(frame.time(), imagePoint) + self.frameTimeToFirstLineTimeDv.toExpression()
+                    else:
+                        keypoint_time = self.__camera_dv.keypointTime(frame.time(), imagePoint) + self.frameTimeToFirstLineTime
 
                     # from camera to target transformation.
                     T_t_c = self.__poseSpline_dv.transformationAtTime(
@@ -440,6 +450,9 @@ class RsCalibrator(object):
         if (self.__isRollingShutter()):
             print "LineDelay:"
             print shutter.lineDelay()
+        if self.frameTimeToFirstLineTimeDv is not None:
+            print "FrameTimeToFirstLineTime:"
+            print self.frameTimeToFirstLineTimeDv.toScalar()
         print "Intrinsics:"
         print proj.getParameters().flatten()
         #print "(",proj.fu(),", ",proj.fv(),") (",proj.cu(),", ",proj.cv(),")" #in the future, not all projection models might support these parameters
