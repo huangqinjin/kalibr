@@ -65,7 +65,10 @@ def printResults(cself, withCov=False):
         if not cself.noTimeCalibration:
             print
             print "cam{0} to imu0 time: [s] (t_imu = t_cam + shift)".format(camNr)
-            print cself.CameraChain.getResultTimeShift(camNr),
+            print cself.CameraChain.getResultTimeShift(camNr)
+            if cself.CameraChain.camList[camNr].lineDelayDv is not None:
+                print "cam{0} line delay: ".format(camNr)
+                print cself.CameraChain.camList[camNr].lineDelayDv.toScalar()
             
             if withCov:
                 print " +- ", cself.std_times[camNr]

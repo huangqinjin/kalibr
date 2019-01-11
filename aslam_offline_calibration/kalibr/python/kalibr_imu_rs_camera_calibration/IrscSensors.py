@@ -67,6 +67,7 @@ class IrscCamera():
      #   self.fullExp = 0
         self.lineDelay = self.fullExp / self.imageHeight
         self.timeshift = None # 0.00282771190097 # 0.0050028984
+        self.lineDelayDv = None if self.lineDelay == 0 else None  # aopt.Scalar(self.lineDelay)
 
         #extract corners
         self.setupCalibrationTarget( targetConfig, showExtraction=showCorners, showReproj=showReproj, imageStepping=showOneStep )
@@ -348,6 +349,9 @@ class IrscCamera():
         self.cameraTimeToImuTimeDv.setActive( not noTimeCalibration )
         self.cameraTimeToImuTimeDv.setActive(self.timeshift is None)
         problem.addDesignVariable(self.cameraTimeToImuTimeDv, ic.CALIBRATION_GROUP_ID)
+        if self.lineDelayDv is not None:
+            self.lineDelayDv.setActive( True )
+            problem.addDesignVariable(self.lineDelayDv, ic.CALIBRATION_GROUP_ID)
         
     def addCameraErrorTerms(self, problem, poseSplineDv, T_cN_b, blakeZissermanDf=0.0, timeOffsetPadding=0.0):
         print
@@ -404,9 +408,11 @@ class IrscCamera():
                 targetPoint = np.insert( targetCornerPoints.transpose()[pidx], 3, 1)
 
                 if self.lineDelay > 0:
-                    ts = frameTime + imageCornerPoints[1,pidx] * self.lineDelay
+                    if self.lineDelayDv is not None:
+                        ts = frameTime + self.lineDelayDv.toExpression() * imageCornerPoints[1,pidx]
+                    else:
+                        ts = frameTime + self.lineDelay * imageCornerPoints[1,pidx]
                     T_w_b = poseSplineDv.transformationAtTime(ts, timeOffsetPadding, timeOffsetPadding)
-                   # T_w_b = poseSplineDv.transformationAtTime(frameTime, timeOffsetPadding, timeOffsetPadding)
                     T_b_w = T_w_b.inverse()
 
                     #calibration target coords to camera N coords
