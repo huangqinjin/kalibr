@@ -61,12 +61,12 @@ class IrscCamera():
         self.camera = kc.AslamCamera.fromParameters( camConfig )
         
         self.imageHeight = camConfig.getResolution()[1]
-        self.fullExp = 0.032314464  # pixel
-     #   self.fullExp = 0.030254520  # tango
-     #   self.fullExp = 0.033323304  # SC
-     #   self.fullExp = 0
-        self.lineDelay = self.fullExp / self.imageHeight
-        self.timeshift = None # 0.00282771190097 # 0.0050028984
+        self.timeshift = None  # 0.00282771190097 # 0.0050028984
+        self.skewtime = 0
+     #   self.skewtime = 0.032314464  # pixel
+     #   self.skewtime = 0.030254520  # tango
+     #   self.skewtime = 0.01825  # SC
+        self.lineDelay = self.skewtime / self.imageHeight
         self.lineDelayDv = None if self.lineDelay == 0 else None  # aopt.Scalar(self.lineDelay)
 
         #extract corners
@@ -291,7 +291,7 @@ class IrscCamera():
             sm.logDebug("dT: {0}".format(dT))
         
         #store the timeshift (t_imu = t_cam + timeshiftCamToImuPrior)
-        self.timeshiftCamToImuPrior = shift - self.fullExp / 2
+        self.timeshiftCamToImuPrior = shift - self.skewtime / 2
         
         print "  Time shift camera to imu (t_imu = t_cam + shift):"
         print self.timeshiftCamToImuPrior
