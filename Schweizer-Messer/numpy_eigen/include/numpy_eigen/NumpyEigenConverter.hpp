@@ -17,6 +17,7 @@
 
 
 #define PY_ARRAY_UNIQUE_SYMBOL NP_Eigen_AS
+// #include <numpy/npy_no_deprecated_api.h>
 #include <numpy/arrayobject.h> 
 
 #include "type_traits.hpp"
